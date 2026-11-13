@@ -43,5 +43,33 @@ jobs:
           python-version: "3.12"
       - name: Install PlatformIO
         run: python -m pip install platformio
-      - name: Compile ESP32 firmware
+      - name: Compile ESP32 controller firmware
         run: pio run
+
+  lora-node-build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install PlatformIO
+        run: python -m pip install platformio
+      - name: Compile LoRa transmitter example
+        run: pio run -d firmware/lora_node
+
+  lora-gateway-build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install PlatformIO
+        run: python -m pip install platformio
+      - name: Compile LoRa receiver example
+        run: pio run -d firmware/lora_gateway
