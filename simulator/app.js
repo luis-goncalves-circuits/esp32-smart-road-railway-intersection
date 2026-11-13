@@ -46,6 +46,7 @@
   let railPriority = false;
   let railOccupied = false;
   let roadTransitionUntil = 0;
+  let pendingManualRoad = null;
 
   const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
   const now = () => performance.now();
@@ -89,6 +90,7 @@
 
   function allRoadRed() {
     for (const direction of DIRS) roadSignals[direction] = 'RED';
+    pendingManualRoad = null;
     roadTransitionUntil = now() + ALL_RED_MS;
     refreshSignalPanels();
   }
@@ -125,9 +127,20 @@
         addEvent('VERDE RECUSADO', 'Prioridade ferroviária ou passagem pedonal activa.');
         return false;
       }
+      if (roadSignals[direction] === 'GREEN') return true;
+      const wasAuthorised = DIRS.some((other) => roadSignals[other] !== 'RED');
       for (const other of DIRS) roadSignals[other] = 'RED';
+      if (wasAuthorised || now() < roadTransitionUntil) {
+        pendingManualRoad = direction;
+        roadTransitionUntil = Math.max(roadTransitionUntil, now() + ALL_RED_MS);
+        refreshSignalPanels();
+        addEvent('VERMELHO INTEGRAL', 'Pedido de verde para ' + DIR_NAMES[direction] + ' em espera até terminar o intervalo de segurança.');
+        return true;
+      }
+      pendingManualRoad = null;
       roadSignals[direction] = 'GREEN';
     } else if (aspect === 'AMBER') {
+      pendingManualRoad = null;
       if (railIsBlockedForRoad() || isPedWalking()) {
         roadSignals[direction] = 'RED';
         addEvent('AMARELO RECUSADO', 'A prioridade ferroviária/pedonal mantém o sinal rodoviário em vermelho.');
@@ -137,6 +150,7 @@
       for (const other of DIRS) roadSignals[other] = 'RED';
       roadSignals[direction] = 'AMBER';
     } else {
+      if (pendingManualRoad === direction) pendingManualRoad = null;
       roadSignals[direction] = 'RED';
     }
     refreshSignalPanels();
@@ -188,7 +202,7 @@
       addEvent('COMANDO PEDONAL IGNORADO', 'No modo automático, o ciclo gere os pedidos.');
       return false;
     }
-    if (incident || railIsBlockedForRoad() || anyCarInConflict() || hasMovingTrain()) {
+    if (incident || railIsBlockedForRoad() || DIRS.some((d) => roadSignals[d] !== 'RED') || anyCarInConflict() || hasMovingTrain()) {
       addEvent('PASSADEIRA BLOQUEADA', 'Não é seguro autorizar peões: existe prioridade ferroviária, incidente ou veículo na zona.');
       return false;
     }
@@ -268,7 +282,9 @@
 
   function rearmIncident() {
     if (!incident) return;
-    if (railIsBlockedForRoad() || anyCarInConflict() || anyPedInMotion()) {
+    const trainStillNear = trains.some((train) => train.x > 175 && train.x < 925);
+    const sensorStillOccupied = railSensors.A || railSensors.B;
+    if (trainStillNear || sensorStillOccupied || anyCarInConflict() || anyPedInMotion()) {
       addEvent('REARME RECUSADO', 'Ainda existe ocupação na zona de conflito ou prioridade ferroviária.');
       setText('status', 'Não é possível rearmar: confirma que a zona está livre e que os sensores estão normalizados.');
       return;
@@ -403,6 +419,20 @@
         }
       }
     }
+  }
+
+  function applyPendingManualRoad(timestamp) {
+    if (mode !== 'manual' || !pendingManualRoad || timestamp < roadTransitionUntil) return;
+    if (railIsBlockedForRoad() || isPedWalking() || anyPedInMotion()) {
+      pendingManualRoad = null;
+      addEvent('VERDE CANCELADO', 'A prioridade ferroviária/pedonal impediu a activação do sinal.');
+      return;
+    }
+    const direction = pendingManualRoad;
+    pendingManualRoad = null;
+    roadSignals[direction] = 'GREEN';
+    refreshSignalPanels();
+    addEvent('VERDE ACTIVADO', 'Intervalo de vermelho concluído na aproximação ' + DIR_NAMES[direction] + '.');
   }
 
   function updateAuto(timestamp) {
@@ -803,12 +833,13 @@
   function frame(timestamp) {
     const dt = lastFrame ? Math.min(60, timestamp - lastFrame) : 0;
     lastFrame = timestamp;
+    if (!paused) updatePedestrians(dt);
     if (!paused && !incident) {
       updateRailPriority();
+      applyPendingManualRoad(timestamp);
       updateAuto(timestamp);
       moveCars(dt);
       moveTrains(dt);
-      updatePedestrians(dt);
       detectConflicts();
       updateRailPriority();
       refreshRailPanels();
@@ -831,7 +862,7 @@
     stopSensors = { N: false, E: false, S: false, O: false };
     selectedCar = 0; selectedTrain = 'A'; mode = $('modeSelect').value;
     autoRoadIndex = 0; autoStage = 'GREEN'; autoStageAt = now(); autoPedDirection = null; autoPedUntil = 0;
-    railPriority = false; railOccupied = false; previousRailPriority = false; roadTransitionUntil = 0;
+    railPriority = false; railOccupied = false; previousRailPriority = false; roadTransitionUntil = 0; pendingManualRoad = null;
     startedAt = Date.now(); lastFrame = 0;
     $('pauseBtn').textContent = 'Ⅱ Pausar';
     $('rearmBtn').disabled = true;
