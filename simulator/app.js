@@ -172,6 +172,11 @@
       return false;
     }
     if (state === 'GO') {
+      const ownTrackOccupied = railSensors[track] || trains.some((train) => train.track === track && train.x > 370 && train.x < 730);
+      if (ownTrackOccupied) {
+        addEvent('MARCHA FERROVIÁRIA RECUSADA', 'A via ' + track + ' está ocupada segundo o sensor/simulador.');
+        return false;
+      }
       if (anyCarInConflict() || isPedWalking() || anyPedInMotion()) {
         addEvent('AUTORIZAÇÃO FERROVIÁRIA RECUSADA', 'A zona de conflito não está livre de veículos/peões.');
         return false;
