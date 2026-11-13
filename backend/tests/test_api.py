@@ -41,3 +41,21 @@ def test_event_validation():
 
 def test_limit_validation():
     assert client.get("/events?limit=0").status_code == 422
+
+
+def test_simulator_cors_preflight():
+    response = client.options(
+        "/events",
+        headers={
+            "Origin": "http://localhost:5500",
+            "Access-Control-Request-Method": "POST",
+            "Access-Control-Request-Headers": "content-type",
+        },
+    )
+    assert response.status_code == 200
+    assert response.headers["access-control-allow-origin"] == "http://localhost:5500"
+
+
+def test_invalid_approach_is_rejected():
+    response = client.post("/events", json={"event_type": "test", "approach": "NORTH"})
+    assert response.status_code == 422
