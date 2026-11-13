@@ -876,7 +876,7 @@
     stopSensors = { N: false, E: false, S: false, O: false };
     selectedCar = 0; selectedTrain = 'A'; mode = $('modeSelect').value;
     autoRoadIndex = 3; autoStage = 'ALL_RED'; autoStageAt = now(); autoPedDirection = null; autoPedUntil = 0;
-    railPriority = false; railOccupied = false; previousRailPriority = false; roadTransitionUntil = 0; pendingManualRoad = null; railReadyAt = { A: 0, B: 0 };
+    railPriority = false; railOccupied = false; roadTransitionUntil = 0; pendingManualRoad = null; railReadyAt = { A: 0, B: 0 };
     startedAt = Date.now(); lastFrame = 0;
     $('pauseBtn').textContent = 'Ⅱ Pausar';
     $('rearmBtn').disabled = true;
