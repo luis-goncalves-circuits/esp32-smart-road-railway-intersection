@@ -10,7 +10,7 @@ Este documento distingue funcionalidades presentes de integrações e testes ain
 - [x] Controlo dos quatro sinais pedonais, pedidos de atravessamento e peões animados.
 - [x] Modo automático demonstrativo para fases rodoviárias.
 - [x] Simulação de sensores de ocupação ferroviária e linhas de paragem.
-- [x] Registo de eventos, contadores, pausa, reinício, retenção e rearme.
+- [x] Registo de eventos, contadores, pausa, reinício, retenção, rearme, paragem de emergência e exportação CSV.
 - [x] Painel de telemetria LoRa simulada, com payload JSON, sequência, RSSI e SNR demonstrativos.
 - [x] HTML autónomo (CSS e JavaScript incorporados) para abrir com duplo clique.
 - [ ] Física calibrada, trajectórias de viragem, filas, interacção entre veículos e cenários editáveis.
