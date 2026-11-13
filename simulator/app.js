@@ -719,6 +719,26 @@
     $('uptime').textContent = String(Math.floor(sec / 60)).padStart(2, '0') + ':' + String(sec % 60).padStart(2, '0');
   }
 
+  function exportEventLog() {
+    if (events.length === 0) {
+      addEvent('EXPORTAÇÃO VAZIA', 'Ainda não existem eventos para exportar.');
+      return;
+    }
+    const quote = (value) => '"' + String(value).replaceAll('"', '""') + '"';
+    const rows = [['hora', 'evento', 'detalhe'], ...events.map((event) => [event.time, event.title, event.detail])];
+    const csv = rows.map((row) => row.map(quote).join(';')).join('\r\n');
+    const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'smart-junction-events.csv';
+    document.body.append(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
+    addEvent('REGISTO EXPORTADO', 'Ficheiro CSV criado no navegador.');
+  }
+
   function transmitLora() {
     packetSequence += 1;
     const payload = {
@@ -776,6 +796,7 @@
       updateCounts(); refreshRailPanels(); addEvent('SIMULAÇÃO LIMPA', 'Veículos, comboios, peões e ocupações simuladas removidos.');
     });
     $('violation').addEventListener('click', () => triggerIncident('Infração simulada pelo operador.'));
+    $('emergencyStop').addEventListener('click', () => triggerIncident('Paragem de emergência accionada pelo operador.'));
     $('rearmBtn').addEventListener('click', rearmIncident);
     $('trainStop').addEventListener('click', () => {
       const train = trains.find((t) => t.track === selectedTrain);
@@ -802,6 +823,7 @@
       }
     });
     $('sendLora').addEventListener('click', transmitLora);
+    $('exportLog').addEventListener('click', exportEventLog);
     $('clearLog').addEventListener('click', () => {
       events = [];
       $('eventCount').textContent = '0';
