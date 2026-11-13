@@ -3,7 +3,7 @@ import sqlite3
 from contextlib import contextmanager
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Iterator, Optional
+from typing import Iterator, Literal, Optional
 
 import httpx
 from fastapi import FastAPI, Header, HTTPException, Query
@@ -27,7 +27,7 @@ app.add_middleware(
 
 class Event(BaseModel):
     event_type: str = Field(min_length=1, max_length=80)
-    approach: Optional[str] = Field(default=None, max_length=8)
+    approach: Optional[Literal["N", "E", "S", "O"]] = None
     plate_text: Optional[str] = Field(default=None, max_length=20)
     evidence_ref: Optional[str] = Field(default=None, max_length=500)
     details: Optional[str] = Field(default=None, max_length=2000)
