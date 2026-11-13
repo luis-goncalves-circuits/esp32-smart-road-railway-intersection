@@ -10,7 +10,9 @@ Protótipo académico de um cruzamento com quatro aproximações rodoviárias e 
 - `scripts/` — verificações estruturais do simulador.
 
 ## Executar o simulador
-A partir da raiz do repositório, execute:
+**Para abrir directamente com duplo clique, descarregue `simulator/standalone.html`.** É um ficheiro autónomo: inclui HTML, CSS, JavaScript e ilustrações, sem depender de pastas adjacentes. No GitHub, abra [simulator/standalone.html](simulator/standalone.html), carregue em **Raw** e guarde o ficheiro com a extensão `.html`.
+
+A página `simulator/index.html` é a versão modular e depende de `style.css`, `app.js` e dos SVG em `assets/`. Não descarregue apenas esse HTML. Para executar a versão modular localmente, extraia o repositório completo e, a partir da raiz, execute:
 
 ~~~bash
 python -m http.server 5500 --directory simulator
