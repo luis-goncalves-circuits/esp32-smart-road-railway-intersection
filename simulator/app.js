@@ -759,6 +759,13 @@
     $('addTrainA').addEventListener('click', () => createTrain('A'));
     $('addTrainB').addEventListener('click', () => createTrain('B'));
     $('addPed').addEventListener('click', () => createPedestrian());
+    $('clearVehicles').addEventListener('click', () => {
+      cars = []; pedestrians = []; trains = [];
+      railSensors = { A: false, B: false };
+      $('sensorA').setAttribute('aria-pressed', 'false'); $('sensorA').textContent = 'Livre'; $('sensorA').classList.remove('on');
+      $('sensorB').setAttribute('aria-pressed', 'false'); $('sensorB').textContent = 'Livre'; $('sensorB').classList.remove('on');
+      updateCounts(); refreshRailPanels(); addEvent('SIMULAÇÃO LIMPA', 'Veículos, comboios, peões e ocupações simuladas removidos.');
+    });
     $('violation').addEventListener('click', () => triggerIncident('Infração simulada pelo operador.'));
     $('rearmBtn').addEventListener('click', rearmIncident);
     $('trainStop').addEventListener('click', () => {
@@ -778,9 +785,9 @@
       allRoadRed();
       allPedestrianStop();
       if (mode === 'auto') {
-        autoRoadIndex = 0; autoStage = 'GREEN'; autoStageAt = now();
-        roadSignals.N = 'GREEN'; refreshSignalPanels();
-        addEvent('MODO AUTOMÁTICO', 'Ciclo sequencial demonstrativo activado.');
+        autoRoadIndex = 3; autoStage = 'ALL_RED'; autoStageAt = now();
+        refreshSignalPanels();
+        addEvent('MODO AUTOMÁTICO', 'Ciclo sequencial demonstrativo activado após vermelho integral.');
       } else {
         addEvent('MODO MANUAL', 'Comandos individuais dos sinais disponíveis.');
       }
@@ -868,7 +875,7 @@
     railSensors = { A: false, B: false };
     stopSensors = { N: false, E: false, S: false, O: false };
     selectedCar = 0; selectedTrain = 'A'; mode = $('modeSelect').value;
-    autoRoadIndex = 0; autoStage = 'GREEN'; autoStageAt = now(); autoPedDirection = null; autoPedUntil = 0;
+    autoRoadIndex = 3; autoStage = 'ALL_RED'; autoStageAt = now(); autoPedDirection = null; autoPedUntil = 0;
     railPriority = false; railOccupied = false; previousRailPriority = false; roadTransitionUntil = 0; pendingManualRoad = null; railReadyAt = { A: 0, B: 0 };
     startedAt = Date.now(); lastFrame = 0;
     $('pauseBtn').textContent = 'Ⅱ Pausar';
@@ -878,7 +885,7 @@
     document.querySelectorAll('[data-stop-sensor]').forEach((button) => { button.setAttribute('aria-pressed', 'false'); button.textContent = 'Normal'; button.classList.remove('on'); });
     createTrain('A'); createTrain('B'); createCar('N'); createCar('O');
     allRoadRed();
-    if (mode === 'auto') { autoStage = 'ALL_RED'; autoStageAt = now(); }
+    if (mode === 'auto') { autoRoadIndex = 3; autoStage = 'ALL_RED'; autoStageAt = now(); }
     refreshSignalPanels(); refreshRailPanels(); refreshPedPanels();
     setSystemState('MANUAL · VERMELHO', 'Todas as autorizações começam em vermelho.', 'var(--muted)');
     addEvent('SISTEMA INICIADO', 'Cruzamento reiniciado em modo manual.');
