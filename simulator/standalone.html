@@ -1,120 +1,117 @@
 <!doctype html>
 <html lang="pt-PT">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#0b1420">
-  <meta name="description" content="Simulador didáctico de um cruzamento rodoviário e ferroviário com controlador ESP32 conceptual.">
-  <title>Smart Junction | Simulador</title>
-  <style>
-:root{color-scheme:dark;--bg:#0b1420;--panel:#121f2d;--panel2:#182a3a;--line:#263b4d;--text:#e8f0f5;--muted:#8da2b2;--cyan:#42c5d9;--green:#45cf91;--amber:#f3b84b;--red:#fa6670}
-*{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--text);font:14px Inter,ui-sans-serif,system-ui,Segoe UI,sans-serif}
-button{font:inherit}
-button:disabled{opacity:.45;cursor:not-allowed}
-.topbar{min-height:68px;padding:0 28px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line);background:#0e1a27;gap:12px}
-.brand{display:flex;align-items:center;gap:12px}.brand-mark{width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,#31bfd0,#217c9a);display:grid;place-items:center;font-weight:900;color:#06151e}.brand strong{display:block;letter-spacing:1.5px;font-size:12px}.brand small,.top-status,.eyebrow,.card-title,.scene-label{font-size:10px;letter-spacing:1.4px;color:var(--muted)}.brand small{display:block;margin-top:3px}.top-status{display:flex;align-items:center;gap:9px}.live-dot{width:7px;height:7px;border-radius:50%;background:var(--green);display:inline-block;box-shadow:0 0 10px #45cf9180}.pill{padding:4px 7px;border:1px solid var(--line);border-radius:5px}
-.layout{max-width:1600px;margin:auto;padding:25px;display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:22px}.workspace{min-width:0}.section-heading{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:17px}.eyebrow{color:var(--cyan);font-weight:700;margin:0 0 7px}h1{font-size:25px;margin:0 0 6px}.muted{color:var(--muted);font-size:12px;margin:0}.run-controls,.toolbar{display:flex;gap:8px;flex-wrap:wrap}.button{border:1px solid var(--line);border-radius:7px;padding:10px 13px;font-weight:650;color:var(--text);cursor:pointer;background:var(--panel2)}.button:hover:not(:disabled){filter:brightness(1.18)}.button:focus-visible,.text-button:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}.button.primary{background:#164d61;border-color:#26758b}.button.danger{background:#542832;border-color:#8e3d4a}.scene-wrap{position:relative;border:1px solid var(--line);border-radius:12px;background:#0f1c29;overflow:hidden}.scene-label{position:absolute;top:13px;left:15px;z-index:1}.scene-wrap canvas{display:block;width:100%;height:auto}.scene-legend{display:flex;gap:18px;padding:10px 15px;border-top:1px solid var(--line);color:var(--muted);font-size:11px;flex-wrap:wrap}.scene-legend span{display:flex;align-items:center;gap:6px}.dot{width:8px;height:8px;border-radius:50%;display:inline-block}.road{background:#596a77}.rail{background:var(--amber)}.safe{background:var(--green)}.danger{background:var(--red)}.toolbar{margin:14px 0}.keyboard-help{border:1px solid var(--line);background:#101d29;padding:12px;border-radius:8px;color:var(--muted);font-size:11px}kbd{padding:3px 6px;background:#253747;border:1px solid #405466;border-radius:4px;color:#fff}
-.sidebar{display:flex;flex-direction:column;gap:12px}.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px}.card-title{display:flex;align-items:center;justify-content:space-between;font-weight:750;margin-bottom:13px}.state-value{font-size:17px;font-weight:800;color:var(--green);margin-bottom:6px}.state-track{height:4px;background:#253746;border-radius:4px;margin-top:13px;overflow:hidden}.state-track span{display:block;width:100%;height:100%;background:var(--green);transition:background .2s}.signal-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}.signal{background:var(--panel2);border:1px solid var(--line);border-radius:7px;padding:9px 5px;text-align:center;display:grid;justify-items:center;gap:5px}.signal b{font-size:11px;color:var(--muted)}.signal i{width:13px;height:13px;border-radius:50%;background:#4b5a64;box-shadow:inset 0 0 0 2px #71818b}.signal.active i{background:var(--green);box-shadow:0 0 12px #45cf91}.signal.red i{background:var(--red);box-shadow:0 0 12px #fa6670}.signal span{font-size:10px;color:var(--muted)}
-.rail-state{display:flex;align-items:center;gap:10px;border-top:1px solid var(--line);padding-top:12px;margin-top:12px}.rail-icon{font-size:22px;color:var(--amber)}.rail-state b,.device b{display:block;font-size:11px}.rail-state small,.device small{display:block;color:var(--muted);font-size:10px;margin-top:3px}.lamp{width:9px;height:9px;border-radius:50%;display:inline-block;margin-left:auto}.lamp.green{background:var(--green);box-shadow:0 0 8px #45cf91}.lamp.amber{background:var(--amber);box-shadow:0 0 8px #f3b84b}.lamp.red{background:var(--red);box-shadow:0 0 8px #fa6670}.metric-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:13px}.metric-grid strong{font-size:22px;display:block}.metric-grid small{font-size:10px;color:var(--muted)}.device{display:flex;align-items:center;gap:9px;padding:5px 0 10px}.device img{width:34px;height:34px;object-fit:contain}.sensor-row{display:flex;justify-content:space-between;border-top:1px solid var(--line);padding-top:9px;margin-top:5px;font-size:10px;color:var(--muted)}.sensor-row b{color:var(--green);font-size:10px}.event-card ol{list-style:none;padding:0;margin:0;max-height:170px;overflow:auto}.event-card li{font-size:10px;color:#c5d2dc;border-top:1px solid var(--line);padding:8px 0;line-height:1.5}.event-card li strong{color:var(--cyan);display:inline-block}.event-card li span{color:#c5d2dc}.event-card .empty{color:var(--muted)}.text-button{background:none;border:0;color:var(--cyan);cursor:pointer;font-size:10px}.disclaimer{border:1px solid #6e5430;background:#2b2418;color:#e8bd70;padding:10px;border-radius:7px;font-size:9px;line-height:1.5}
-footer{border-top:1px solid var(--line);padding:15px 25px;text-align:center;color:var(--muted);font-size:9px;letter-spacing:1px}footer span{color:var(--cyan)}
-@media(max-width:1050px){.layout{grid-template-columns:1fr}.sidebar{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}.disclaimer{grid-column:1/-1}}
-@media(max-width:650px){.layout{padding:12px}.topbar{padding:12px 14px;flex-wrap:wrap}.section-heading{align-items:flex-start;flex-direction:column}.sidebar{grid-template-columns:1fr}.disclaimer{grid-column:auto}h1{font-size:21px}.scene-legend{gap:9px}.toolbar>.button{flex:1 1 46%}}
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0b1420">
+<meta name="description" content="Simulador didáctico de cruzamento rodoviário e ferroviário, semáforos, peões e telemetria LoRa.">
+<title>Smart Junction | Simulador de tráfego</title>
+<style>
+:root{color-scheme:dark;--bg:#09131e;--panel:#121f2d;--panel2:#182a3a;--line:#263b4d;--text:#e8f0f5;--muted:#8da2b2;--cyan:#42c5d9;--green:#45cf91;--amber:#f3b84b;--red:#fa6670;--purple:#b69bea}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:14px Inter,ui-sans-serif,system-ui,Segoe UI,sans-serif}button,select{font:inherit}button:disabled{opacity:.4;cursor:not-allowed}
+.topbar{min-height:68px;padding:10px 26px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line);background:#0e1a27;gap:12px}.brand{display:flex;align-items:center;gap:12px}.brand-mark{width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,#31bfd0,#217c9a);display:grid;place-items:center;font-weight:900;color:#06151e}.brand strong{display:block;letter-spacing:1.5px;font-size:12px}.brand small,.top-status,.eyebrow,.card-title,.scene-label{font-size:10px;letter-spacing:1.3px;color:var(--muted)}.brand small{display:block;margin-top:3px}.top-status{display:flex;align-items:center;gap:9px}.live-dot{width:7px;height:7px;border-radius:50%;background:var(--green);display:inline-block;box-shadow:0 0 10px #45cf9180}.pill{padding:4px 7px;border:1px solid var(--line);border-radius:5px}.amber-text{color:var(--amber)}
+.layout{max-width:1800px;margin:auto;padding:20px;display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:18px}.workspace{min-width:0}.section-heading{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:15px}.eyebrow{color:var(--cyan);font-weight:700;margin:0 0 6px}h1{font-size:24px;margin:0 0 5px}.muted{color:var(--muted);font-size:11px;margin:0}.run-controls,.toolbar{display:flex;gap:7px;flex-wrap:wrap;align-items:center}.mode-label,.train-tools label{font-size:11px;color:var(--muted)}.select{background:#172a39;color:var(--text);border:1px solid #3a5264;border-radius:6px;padding:8px 10px}.button{border:1px solid var(--line);border-radius:7px;padding:9px 12px;font-weight:650;color:var(--text);cursor:pointer;background:var(--panel2)}.button:hover:not(:disabled){filter:brightness(1.16)}.button:focus-visible,.aspect:focus-visible,.toggle:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}.button.primary{background:#164d61;border-color:#26758b}.button.danger{background:#542832;border-color:#8e3d4a}.button.mini{padding:6px 8px;font-size:10px}.button.rail-go,.button.ped-go{background:#174b3b;border-color:#2b8668}.scene-wrap{position:relative;border:1px solid var(--line);border-radius:11px;background:#0f1c29;overflow:hidden}.scene-label{position:absolute;top:11px;left:13px;z-index:1}.scene-wrap canvas{display:block;width:100%;height:auto}.scene-legend{display:flex;gap:15px;padding:9px 13px;border-top:1px solid var(--line);color:var(--muted);font-size:10px;flex-wrap:wrap}.scene-legend span{display:flex;align-items:center;gap:6px}.dot{width:8px;height:8px;border-radius:50%;display:inline-block}.road{background:#596a77}.rail{background:var(--amber)}.ped{background:var(--purple)}.safe{background:var(--green)}.danger{background:var(--red)}.toolbar{margin:11px 0}.keyboard-help{border:1px solid var(--line);background:#101d29;padding:10px;border-radius:8px;color:var(--muted);font-size:10px}kbd{padding:2px 5px;background:#253747;border:1px solid #405466;border-radius:4px;color:#fff}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:9px;padding:13px}.control-card{margin-top:12px}.card-title{display:flex;align-items:center;justify-content:space-between;font-weight:750;margin-bottom:10px}.hint{font-size:10px;line-height:1.5;color:var(--muted);margin:0 0 10px}.signal-control-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}.signal-control{display:flex;flex-direction:column;gap:7px;background:var(--panel2);border:1px solid var(--line);padding:9px;border-radius:7px}.signal-control>b{font-size:11px}.signal-control>div{display:flex;gap:4px;flex-wrap:wrap}.aspect{border:1px solid #435768;border-radius:5px;padding:5px 7px;font-size:10px;color:var(--text);background:#243746;cursor:pointer}.aspect.red{border-color:#87414b}.aspect.amber{border-color:#947132}.aspect.green{border-color:#317b60}.aspect-badge{font-size:9px;letter-spacing:.4px;padding:5px 7px;border-radius:5px;display:inline-block;width:max-content}.aspect-badge.red{background:#49252b;color:#ff9da4}.aspect-badge.amber{background:#4b3b20;color:#ffd27b}.aspect-badge.green{background:#1d4438;color:#8ae0bd}.control-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.rail-control-row,.ped-control-row{display:flex;gap:6px;align-items:center;flex-wrap:wrap;border-top:1px solid var(--line);padding:8px 0}.rail-control-row>b,.ped-control-row>b{font-size:11px;min-width:42px}.rail-control-row .aspect-badge,.ped-control-row .aspect-badge{margin-right:auto}.train-tools{border-top:1px solid var(--line);padding-top:9px;margin-top:5px;display:flex;align-items:center;gap:7px;flex-wrap:wrap}.ped-footer{border-top:1px solid var(--line);padding-top:8px;font-size:10px;color:var(--muted)}.toggle{border:1px solid var(--line);border-radius:5px;background:#1b3443;color:var(--text);font-size:10px;padding:6px 9px;cursor:pointer;min-width:76px}.toggle[aria-pressed="true"]{background:#56313a;border-color:#ad5964;color:#ffc1c5}.sensor-control{display:flex;align-items:center;justify-content:space-between;gap:7px;border-top:1px solid var(--line);padding:7px 0}.sensor-control b{font-size:10px;font-weight:550;color:#c8d4dc}.lora-stats{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:10px}.lora-stats div{background:var(--panel2);border-radius:6px;padding:8px}.lora-stats small{display:block;color:var(--muted);font-size:9px}.lora-stats b{font-size:12px}.payload{white-space:pre-wrap;overflow-wrap:anywhere;background:#08121b;border:1px solid var(--line);border-radius:6px;padding:9px;color:#9bd9c4;font-size:9px;max-height:130px;overflow:auto;margin:9px 0 0}
+.sidebar{display:flex;flex-direction:column;gap:11px}.status-value{font-size:15px;font-weight:800;color:var(--green);margin-bottom:6px}.state-track{height:4px;background:#253746;border-radius:4px;margin-top:12px;overflow:hidden}.state-track span{display:block;width:100%;height:100%;background:var(--green)}.metric-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.metric-grid strong{font-size:22px;display:block}.metric-grid small{font-size:10px;color:var(--muted)}.sensor-row{display:flex;justify-content:space-between;border-top:1px solid var(--line);padding-top:8px;margin-top:7px;font-size:10px;color:var(--muted)}.sensor-row b{color:var(--green);font-size:10px}.camera-icon{font-size:24px;color:var(--cyan);width:32px;text-align:center}.device{display:flex;align-items:center;gap:9px}.device b{display:block;font-size:11px}.device small{display:block;color:var(--muted);font-size:10px;margin-top:3px}.lamp{width:9px;height:9px;border-radius:50%;display:inline-block;margin-left:auto}.lamp.green{background:var(--green)}.lamp.amber{background:var(--amber)}.lamp.red{background:var(--red)}.event-card ol{list-style:none;padding:0;margin:0;max-height:220px;overflow:auto}.event-card li{font-size:10px;color:#c5d2dc;border-top:1px solid var(--line);padding:7px 0;line-height:1.45}.event-card li strong{color:var(--cyan);display:block}.event-card li span{color:#c5d2dc}.event-card .empty{color:var(--muted)}.text-button{background:none;border:0;color:var(--cyan);cursor:pointer;font-size:10px}.disclaimer{border:1px solid #6e5430;background:#2b2418;color:#e8bd70;padding:10px;border-radius:7px;font-size:9px;line-height:1.5}
+footer{border-top:1px solid var(--line);padding:14px 20px;text-align:center;color:var(--muted);font-size:9px;letter-spacing:1px}footer span{color:var(--cyan)}
+@media(max-width:1200px){.layout{grid-template-columns:1fr}.sidebar{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}.disclaimer{grid-column:1/-1}}
+@media(max-width:800px){.signal-control-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.control-grid{grid-template-columns:1fr}.section-heading{align-items:flex-start;flex-direction:column}}
+@media(max-width:560px){.layout{padding:10px}.topbar{padding:10px 12px;flex-wrap:wrap}.sidebar{grid-template-columns:1fr}.disclaimer{grid-column:auto}.toolbar>.button{flex:1 1 45%}.signal-control-grid{grid-template-columns:1fr 1fr}.rail-control-row,.ped-control-row{gap:4px}}
 </style>
-  
+
 </head>
 <body>
-  <header class="topbar">
-    <div class="brand">
-      <span class="brand-mark" aria-hidden="true">SJ</span>
-      <div><strong>SMART JUNCTION</strong><small>ROAD + RAIL CONTROL LAB</small></div>
+<header class="topbar">
+  <div class="brand"><span class="brand-mark">SJ</span><div><strong>SMART JUNCTION</strong><small>ROAD · RAIL · PEDESTRIAN · LoRa LAB</small></div></div>
+  <div class="top-status"><span class="live-dot"></span> SIMULAÇÃO LOCAL <span class="pill">v0.4</span></div>
+</header>
+<main class="layout">
+<section class="workspace" aria-labelledby="pageTitle">
+  <div class="section-heading">
+    <div><p class="eyebrow">CENTRO DE CONTROLO</p><h1 id="pageTitle">Cruzamento inteligente</h1><p class="muted">4 aproximações rodoviárias · 2 vias ferroviárias · 4 passadeiras · ESP32 + LoRa conceptual</p></div>
+    <div class="run-controls">
+      <label class="mode-label" for="modeSelect">Modo</label>
+      <select id="modeSelect" class="select"><option value="manual" selected>Manual</option><option value="auto">Automático</option></select>
+      <button id="pauseBtn" class="button secondary" type="button">Ⅱ Pausar</button>
+      <button id="reset" class="button secondary" type="button">↻ Reiniciar</button>
     </div>
-    <div class="top-status"><span class="live-dot" aria-hidden="true"></span> SIMULAÇÃO LOCAL <span class="pill">v0.3</span></div>
-  </header>
+  </div>
+  <div class="scene-wrap">
+    <div class="scene-label">VISTA SUPERIOR · SIMULAÇÃO 2D</div>
+    <canvas id="scene" width="1100" height="760" aria-label="Cruzamento com quatro estradas, duas vias ferroviárias paralelas, semáforos e passadeiras para peões"></canvas>
+    <div class="scene-legend"><span><i class="dot road"></i> Estrada</span><span><i class="dot rail"></i> Ferrovia</span><span><i class="dot ped"></i> Passadeira</span><span><i class="dot safe"></i> Verde</span><span><i class="dot danger"></i> Bloqueio</span></div>
+  </div>
+  <div class="toolbar">
+    <button id="addCar" class="button primary" type="button">＋ Automóvel</button>
+    <button id="addTrainA" class="button primary" type="button">＋ Comboio via A</button>
+    <button id="addTrainB" class="button primary" type="button">＋ Comboio via B</button>
+    <button id="addPed" class="button primary" type="button">＋ Peão</button>
+    <button id="clearVehicles" class="button secondary" type="button">Limpar veículos da simulação</button>
+    <button id="violation" class="button danger" type="button">⚠ Simular infracção</button>
+    <button id="rearmBtn" class="button secondary" type="button" disabled>Rearmar</button>
+  </div>
+  <div class="keyboard-help"><b>Controlos:</b> setas para conduzir o automóvel seleccionado · <kbd>Shift</kbd> + ←/→ para mover o comboio seleccionado · <kbd>Tab</kbd> muda o automóvel · <kbd>Espaço</kbd> pausa/retoma. Selecciona o comboio no painel ferroviário.</div>
 
-  <main class="layout">
-    <section class="workspace" aria-labelledby="pageTitle">
-      <div class="section-heading">
-        <div>
-          <p class="eyebrow">CENTRO DE CONTROLO</p>
-          <h1 id="pageTitle">Cruzamento inteligente</h1>
-          <p class="muted">Quatro aproximações rodoviárias · duas vias ferroviárias · controlo ESP32 conceptual</p>
-        </div>
-        <div class="run-controls">
-          <button id="pauseBtn" class="button secondary" type="button">Ⅱ Pausar</button>
-          <button id="reset" class="button secondary" type="button">↻ Reiniciar</button>
-        </div>
-      </div>
+  <section class="card control-card">
+    <div class="card-title"><span>SEMÁFOROS RODOVIÁRIOS · COMANDO MANUAL</span><span class="muted">N / E / S / O</span></div>
+    <p class="hint">No modo manual, escolhe vermelho, amarelo ou verde para cada aproximação. O interbloqueio bloqueia verdes incompatíveis e qualquer autorização rodoviária perante prioridade ferroviária ou passagem pedonal activa.</p>
+    <div class="signal-control-grid">
+      <div class="signal-control"><b>NORTE</b><span id="roadNState" class="aspect-badge red">VERMELHO</span><div><button data-road="N" data-aspect="RED" class="aspect red">Vermelho</button><button data-road="N" data-aspect="AMBER" class="aspect amber">Amarelo</button><button data-road="N" data-aspect="GREEN" class="aspect green">Verde</button></div></div>
+      <div class="signal-control"><b>ESTE</b><span id="roadEState" class="aspect-badge red">VERMELHO</span><div><button data-road="E" data-aspect="RED" class="aspect red">Vermelho</button><button data-road="E" data-aspect="AMBER" class="aspect amber">Amarelo</button><button data-road="E" data-aspect="GREEN" class="aspect green">Verde</button></div></div>
+      <div class="signal-control"><b>SUL</b><span id="roadSState" class="aspect-badge red">VERMELHO</span><div><button data-road="S" data-aspect="RED" class="aspect red">Vermelho</button><button data-road="S" data-aspect="AMBER" class="aspect amber">Amarelo</button><button data-road="S" data-aspect="GREEN" class="aspect green">Verde</button></div></div>
+      <div class="signal-control"><b>OESTE</b><span id="roadOState" class="aspect-badge red">VERMELHO</span><div><button data-road="O" data-aspect="RED" class="aspect red">Vermelho</button><button data-road="O" data-aspect="AMBER" class="aspect amber">Amarelo</button><button data-road="O" data-aspect="GREEN" class="aspect green">Verde</button></div></div>
+    </div>
+  </section>
 
-      <div class="scene-wrap">
-        <div class="scene-label">VISTA SUPERIOR · SIMULAÇÃO 2D</div>
-        <canvas id="scene" width="1000" height="680" aria-label="Vista superior de um cruzamento rodoviário de quatro sentidos atravessado por duas vias ferroviárias"></canvas>
-        <div class="scene-legend" aria-label="Legenda">
-          <span><i class="dot road"></i> Estrada</span>
-          <span><i class="dot rail"></i> Ferrovia</span>
-          <span><i class="dot safe"></i> Zona livre</span>
-          <span><i class="dot danger"></i> Incidente</span>
-        </div>
-      </div>
+  <section class="control-grid">
+    <div class="card control-card">
+      <div class="card-title"><span>SINAIS FERROVIÁRIOS</span><span class="muted">VIAS A / B</span></div>
+      <p class="hint">Autoriza a marcha do comboio seleccionado. A autorização é recusada se houver veículos ou peões na zona de conflito.</p>
+      <div class="rail-control-row"><b>Via A</b><span id="railAState" class="aspect-badge red">PARAR</span><button data-rail="A" data-state="STOP" class="button mini secondary">Parar</button><button data-rail="A" data-state="GO" class="button mini rail-go">Autorizar</button></div>
+      <div class="rail-control-row"><b>Via B</b><span id="railBState" class="aspect-badge red">PARAR</span><button data-rail="B" data-state="STOP" class="button mini secondary">Parar</button><button data-rail="B" data-state="GO" class="button mini rail-go">Autorizar</button></div>
+      <div class="train-tools"><label for="trainSelect">Comboio seleccionado</label><select id="trainSelect" class="select"><option value="A">Via A</option><option value="B">Via B</option></select><button id="trainStop" class="button mini danger" type="button">Parar comboio</button></div>
+    </div>
+    <div class="card control-card">
+      <div class="card-title"><span>PASSADEIRAS E PEÕES</span><span class="muted">4 TRAVESSIAS</span></div>
+      <p class="hint">Os pedidos de atravessamento ficam em fila. No modo manual, coloca os veículos em vermelho e depois autoriza a travessia pedonal.</p>
+      <div class="ped-control-row"><b>Norte</b><span id="pedNState" class="aspect-badge red">NÃO ATRAVESSAR</span><button data-ped-request="N" class="button mini secondary">Pedir</button><button data-ped-state="N" data-state="WALK" class="button mini ped-go">Autorizar</button><button data-ped-state="N" data-state="STOP" class="button mini danger">Parar</button></div>
+      <div class="ped-control-row"><b>Este</b><span id="pedEState" class="aspect-badge red">NÃO ATRAVESSAR</span><button data-ped-request="E" class="button mini secondary">Pedir</button><button data-ped-state="E" data-state="WALK" class="button mini ped-go">Autorizar</button><button data-ped-state="E" data-state="STOP" class="button mini danger">Parar</button></div>
+      <div class="ped-control-row"><b>Sul</b><span id="pedSState" class="aspect-badge red">NÃO ATRAVESSAR</span><button data-ped-request="S" class="button mini secondary">Pedir</button><button data-ped-state="S" data-state="WALK" class="button mini ped-go">Autorizar</button><button data-ped-state="S" data-state="STOP" class="button mini danger">Parar</button></div>
+      <div class="ped-control-row"><b>Oeste</b><span id="pedOState" class="aspect-badge red">NÃO ATRAVESSAR</span><button data-ped-request="O" class="button mini secondary">Pedir</button><button data-ped-state="O" data-state="WALK" class="button mini ped-go">Autorizar</button><button data-ped-state="O" data-state="STOP" class="button mini danger">Parar</button></div>
+      <div class="ped-footer"><span id="pedCount">0</span> peões na simulação · <span id="pedRequests">0</span> pedidos pendentes</div>
+    </div>
+  </section>
 
-      <div class="toolbar">
-        <button id="addCar" class="button primary" type="button">＋ Automóvel</button>
-        <button id="addTrain" class="button primary" type="button">＋ Comboio</button>
-        <button id="violation" class="button danger" type="button">⚠ Simular infracção</button>
-        <button id="clearVehicles" class="button secondary" type="button">Limpar veículos</button>
-        <button id="rearmBtn" class="button secondary" type="button" disabled>Rearmar após verificação</button>
-      </div>
+  <section class="control-grid">
+    <div class="card control-card">
+      <div class="card-title"><span>SENSORES SIMULADOS</span><span class="muted">ENTRADAS</span></div>
+      <div class="sensor-control"><b>Ocupação via A</b><button id="sensorA" class="toggle" type="button" aria-pressed="false">Livre</button></div>
+      <div class="sensor-control"><b>Ocupação via B</b><button id="sensorB" class="toggle" type="button" aria-pressed="false">Livre</button></div>
+      <div class="sensor-control"><b>Linha de paragem N</b><button data-stop-sensor="N" class="toggle" type="button" aria-pressed="false">Normal</button></div>
+      <div class="sensor-control"><b>Linha de paragem E</b><button data-stop-sensor="E" class="toggle" type="button" aria-pressed="false">Normal</button></div>
+      <div class="sensor-control"><b>Linha de paragem S</b><button data-stop-sensor="S" class="toggle" type="button" aria-pressed="false">Normal</button></div>
+      <div class="sensor-control"><b>Linha de paragem O</b><button data-stop-sensor="O" class="toggle" type="button" aria-pressed="false">Normal</button></div>
+    </div>
+    <div class="card control-card">
+      <div class="card-title"><span>LoRa · TELEMETRIA</span><span class="pill amber-text">RÁDIO SIMULADO</span></div>
+      <p class="hint">Simula pacotes de estado do ESP32 para uma estação remota. Não existe transmissão RF neste modo de navegador.</p>
+      <div class="lora-stats"><div><small>Gateway</small><b id="loraLink">Desligado</b></div><div><small>RSSI simulado</small><b id="loraRssi">— dBm</b></div><div><small>SNR simulado</small><b id="loraSnr">— dB</b></div><div><small>Pacotes TX</small><b id="loraPackets">0</b></div></div>
+      <button id="sendLora" class="button primary" type="button">⇧ Enviar telemetria LoRa</button>
+      <pre id="loraPayload" class="payload">À espera do primeiro pacote…</pre>
+    </div>
+  </section>
+</section>
 
-      <div class="keyboard-help"><b>Controlos:</b> setas para conduzir o automóvel seleccionado · <kbd>Shift</kbd> + ←/→ para conduzir o comboio · <kbd>Tab</kbd> muda o automóvel seleccionado · <kbd>Espaço</kbd> pausa/retoma</div>
-    </section>
-
-    <aside class="sidebar" aria-label="Painel de controlo">
-      <section class="card status-card">
-        <div class="card-title"><span>ESTADO DO SISTEMA</span><span class="live-dot" aria-hidden="true"></span></div>
-        <div id="systemState" class="state-value">OPERAÇÃO NORMAL</div>
-        <p id="status" class="muted" role="status">Sistema em funcionamento normal.</p>
-        <div class="state-track"><span id="stateTrack"></span></div>
-      </section>
-
-      <section class="card">
-        <div class="card-title">FASES DE SINALIZAÇÃO <span class="muted">CICLO DEMO</span></div>
-        <div class="signal-grid">
-          <div class="signal" id="sigN"><b>N</b><i></i><span>Norte</span></div>
-          <div class="signal" id="sigE"><b>E</b><i></i><span>Este</span></div>
-          <div class="signal" id="sigS"><b>S</b><i></i><span>Sul</span></div>
-          <div class="signal" id="sigW"><b>O</b><i></i><span>Oeste</span></div>
-        </div>
-        <div class="rail-state"><span class="rail-icon" aria-hidden="true">▰</span><div><b>Prioridade ferroviária</b><small id="railState">Via livre · sem comboio na zona</small></div><span id="railLamp" class="lamp green"></span></div>
-      </section>
-
-      <section class="card metrics">
-        <div class="card-title">INDICADORES</div>
-        <div class="metric-grid">
-          <div><strong id="carCount">0</strong><small>Automóveis</small></div>
-          <div><strong id="trainCount">0</strong><small>Comboios</small></div>
-          <div><strong id="eventCount">0</strong><small>Ocorrências</small></div>
-          <div><strong id="uptime">00:00</strong><small>Tempo de sessão</small></div>
-        </div>
-      </section>
-
-      <section class="card">
-        <div class="card-title">SENSORES E EQUIPAMENTO</div>
-        <div class="device"><svg class="inline-device-icon" viewBox="0 0 120 100" role="img" aria-label="Ilustração de uma placa ESP32"><rect x="15" y="8" width="90" height="84" rx="9" fill="#168a76"/><rect x="35" y="24" width="50" height="48" rx="5" fill="#243746"/><text x="60" y="53" text-anchor="middle" font-size="10" fill="white">ESP32</text></svg><div><b>Controlador ESP32</b><small>Unidade lógica · protótipo</small></div><span class="lamp green"></span></div>
-        <div class="device"><svg class="inline-device-icon" viewBox="0 0 100 100" role="img" aria-label="Ilustração de uma câmara"><rect x="18" y="40" width="64" height="42" rx="8" fill="#243746"/><path d="m30 40 9-15h25l9 15" fill="#607d8b"/><circle cx="50" cy="60" r="16" fill="#8ed8ec"/><circle cx="50" cy="60" r="9" fill="#102331"/></svg><div><b>Câmara / ANPR</b><small id="cameraState">Integração por implementar</small></div><span class="lamp amber"></span></div>
-        <div class="sensor-row"><span>Detecção de ocupação ferroviária A/B</span><b id="sensorRail">LIVRE</b></div>
-        <div class="sensor-row"><span>Sensores de linha de paragem</span><b id="sensorStop">NORMAL</b></div>
-      </section>
-
-      <section class="card event-card">
-        <div class="card-title">REGISTO DE EVENTOS <button id="clearLog" class="text-button" type="button">Limpar</button></div>
-        <ol id="eventLog" aria-live="polite"><li class="empty">Sem ocorrências nesta sessão.</li></ol>
-      </section>
-
-      <section class="disclaimer">AMBIENTE DE ENSAIO ACADÉMICO. Não controla infra-estrutura real nem substitui sinalização certificada.</section>
-    </aside>
-  </main>
-
-  <footer>ESP32 SMART ROAD–RAILWAY INTERSECTION <span>·</span> Simulador demonstrativo, sem ligação física ao controlador.</footer>
+<aside class="sidebar" aria-label="Painel de estado">
+  <section class="card status-card"><div class="card-title"><span>ESTADO DO SISTEMA</span><span class="live-dot"></span></div><div id="systemState" class="state-value">MANUAL · VERMELHO</div><p id="status" class="muted" role="status">Todas as autorizações começam em vermelho.</p><div class="state-track"><span id="stateTrack"></span></div></section>
+  <section class="card"><div class="card-title">INDICADORES</div><div class="metric-grid"><div><strong id="carCount">0</strong><small>Automóveis</small></div><div><strong id="trainCount">0</strong><small>Comboios</small></div><div><strong id="eventCount">0</strong><small>Ocorrências</small></div><div><strong id="uptime">00:00</strong><small>Tempo de sessão</small></div></div></section>
+  <section class="card"><div class="card-title">ESTADO FERROVIÁRIO</div><div class="sensor-row"><span>Via A</span><b id="railAStatus">LIVRE</b></div><div class="sensor-row"><span>Via B</span><b id="railBStatus">LIVRE</b></div><div class="sensor-row"><span>Zona de conflito</span><b id="conflictStatus">LIVRE</b></div></section>
+  <section class="card"><div class="card-title">CÂMARAS / ANPR</div><div class="device"><span class="camera-icon">◉</span><div><b>Leitura de matrículas</b><small>Integração de vídeo por implementar</small></div><span class="lamp amber"></span></div><p class="hint">Não existe captura real, OCR ou identificação do condutor nesta versão.</p></section>
+  <section class="card event-card"><div class="card-title">REGISTO DE EVENTOS <button id="clearLog" class="text-button" type="button">Limpar</button></div><ol id="eventLog" aria-live="polite"><li class="empty">Sem ocorrências nesta sessão.</li></ol></section>
+  <div class="disclaimer">SIMULADOR ACADÉMICO. Os comandos representam um modelo didáctico e não controlam qualquer sinalização, comboio ou equipamento real. Não usar em infra-estrutura operacional.</div>
+</aside>
+</main>
+<footer>ESP32 SMART ROAD–RAILWAY INTERSECTION <span>·</span> Simulação local · LoRa RF não ligado.</footer>
 <script>
 'use strict';
 
@@ -123,369 +120,684 @@ footer{border-top:1px solid var(--line);padding:15px 25px;text-align:center;colo
   if (!canvas) return;
   const ctx = canvas.getContext('2d');
   if (!ctx) return;
-
   const $ = (id) => document.getElementById(id);
   const W = canvas.width;
   const H = canvas.height;
-  const CONFLICT = { left: 350, right: 650, top: 190, bottom: 490 };
-  const PHASES = ['N', 'E', 'S', 'O'];
-  const SIGNAL_IDS = { N: 'sigN', E: 'sigE', S: 'sigS', O: 'sigW' };
-  const PHASE_MS = 9000;
-  const ALL_RED_MS = 1800;
-  const TRAIN_WARNING_LEFT = 190;
-  const TRAIN_WARNING_RIGHT = 810;
-  const CAR_COLORS = ['#39b7d4', '#e8a34b', '#a58be8', '#ed6d79', '#65c68c'];
+  const DIRS = ['N', 'E', 'S', 'O'];
+  const DIR_NAMES = { N: 'Norte', E: 'Este', S: 'Sul', O: 'Oeste' };
+  const SIGNAL_IDS = { N: 'roadNState', E: 'roadEState', S: 'roadSState', O: 'roadOState' };
+  const PED_IDS = { N: 'pedNState', E: 'pedEState', S: 'pedSState', O: 'pedOState' };
+  const PHASE_MS = 6500;
+  const AMBER_MS = 1800;
+  const ALL_RED_MS = 1400;
+  const PED_WALK_MS = 4200;
+  const CONFLICT = { left: 390, right: 710, top: 245, bottom: 550 };
+  const RAIL_Y = { A: 320, B: 460 };
+  const CAR_COLORS = ['#39b7d4', '#e8a34b', '#a58be8', '#ed6d79', '#65c68c', '#e2d46c'];
 
+  let mode = 'manual';
+  let paused = false;
+  let incident = false;
   let cars = [];
   let trains = [];
+  let pedestrians = [];
   let events = [];
+  let roadSignals = { N: 'RED', E: 'RED', S: 'RED', O: 'RED' };
+  let railSignals = { A: 'STOP', B: 'STOP' };
+  let pedestrianSignals = { N: 'STOP', E: 'STOP', S: 'STOP', O: 'STOP' };
+  let pedestrianRequests = { N: 0, E: 0, S: 0, O: 0 };
+  let railSensors = { A: false, B: false };
+  let stopSensors = { N: false, E: false, S: false, O: false };
   let selectedCar = 0;
-  let phaseIndex = 0;
-  let phaseStartedAt = 0;
-  let allRedUntil = 0;
-  let startedAt = 0;
-  let lastFrameAt = 0;
-  let paused = false;
-  let incidentHold = false;
-  let railApproachActive = false;
+  let selectedTrain = 'A';
+  let autoRoadIndex = 0;
+  let autoStage = 'GREEN';
+  let autoStageAt = 0;
+  let autoPedDirection = null;
+  let autoPedUntil = 0;
+  let startedAt = Date.now();
+  let lastFrame = 0;
+  let packetSequence = 0;
+  let railPriority = false;
   let railOccupied = false;
-  let previousRailPriority = false;
+  let roadTransitionUntil = 0;
+  let pendingManualRoad = null;
+  let railReadyAt = { A: 0, B: 0 };
 
-  function setText(id, value) {
-    const element = $(id);
-    if (element) element.textContent = String(value);
-  }
+  const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
+  const now = () => performance.now();
+  const isPedWalking = () => DIRS.some((d) => pedestrianSignals[d] === 'WALK');
+  const hasMovingTrain = () => trains.some((t) => Math.abs(t.speed) > 0.01);
+  const trainNearCrossing = () => trains.some((t) => t.x > 175 && t.x < 925);
+  const anyRailSensor = () => railSensors.A || railSensors.B || trains.some((t) => t.x > 390 && t.x < 710);
+  const anyCarInConflict = () => cars.some((c) => c.x > CONFLICT.left && c.x < CONFLICT.right && c.y > CONFLICT.top && c.y < CONFLICT.bottom);
+  const anyPedInMotion = () => pedestrians.length > 0;
 
-  function appendEvent(title, detail) {
-    const event = { time: new Date().toLocaleTimeString('pt-PT'), title, detail };
-    events.unshift(event);
-    events = events.slice(0, 40);
-    setText('eventCount', events.length);
+  function addEvent(title, detail) {
+    events.unshift({ time: new Date().toLocaleTimeString('pt-PT'), title, detail });
+    events = events.slice(0, 60);
+    $('eventCount').textContent = events.length;
     const list = $('eventLog');
-    if (!list) return;
     list.replaceChildren();
-    for (const item of events) {
-      const li = document.createElement('li');
-      const heading = document.createElement('strong');
-      heading.textContent = item.time + ' · ' + item.title;
-      const description = document.createElement('span');
-      description.textContent = item.detail;
-      li.append(heading, document.createElement('br'), description);
-      list.append(li);
-    }
-    if (events.length === 0) {
-      const li = document.createElement('li');
-      li.className = 'empty';
-      li.textContent = 'Sem ocorrências nesta sessão.';
-      list.append(li);
-    }
-  }
-
-  function updateMetrics() {
-    setText('carCount', cars.length);
-    setText('trainCount', trains.length);
-  }
-
-  function createCar(approach = PHASES[cars.length % PHASES.length]) {
-    const positions = {
-      N: { x: 455, y: 105, vx: 0, vy: 0 },
-      S: { x: 545, y: 575, vx: 0, vy: 0 },
-      O: { x: 105, y: 325, vx: 0, vy: 0 },
-      E: { x: 895, y: 355, vx: 0, vy: 0 }
-    };
-    const position = positions[approach] || positions.N;
-    cars.push({
-      id: String(Date.now()) + '-' + String(Math.random()),
-      approach,
-      x: position.x,
-      y: position.y,
-      vx: position.vx,
-      vy: position.vy,
-      color: CAR_COLORS[cars.length % CAR_COLORS.length],
-      enteredIntersection: false
-    });
-    selectedCar = cars.length - 1;
-    appendEvent('AUTOMÓVEL ADICIONADO', 'Veículo colocado na aproximação ' + approach + '.');
-    updateMetrics();
-  }
-
-  function createTrain() {
-    if (trains.length >= 2) {
-      appendEvent('LIMITE DE COMBOIOS', 'A simulação permite até dois comboios em simultâneo.');
+    if (!events.length) {
+      const item = document.createElement('li');
+      item.className = 'empty';
+      item.textContent = 'Sem ocorrências nesta sessão.';
+      list.append(item);
       return;
     }
-    const fromWest = trains.length === 0;
-    trains.push({
-      x: fromWest ? -120 : W + 120,
-      y: fromWest ? 270 : 410,
-      vx: 0,
-      length: 100,
-      controlled: false
-    });
-    appendEvent('COMBOIO ADICIONADO', 'Comboio criado numa das duas vias ferroviárias.');
-    updateMetrics();
+    for (const event of events) {
+      const item = document.createElement('li');
+      const heading = document.createElement('strong');
+      heading.textContent = event.time + ' · ' + event.title;
+      const detail = document.createElement('span');
+      detail.textContent = event.detail;
+      item.append(heading, detail);
+      list.append(item);
+    }
   }
 
-  function trainInWarningZone(train) {
-    return train.x > TRAIN_WARNING_LEFT - train.length && train.x < TRAIN_WARNING_RIGHT + train.length;
+  function updateCounts() {
+    $('carCount').textContent = cars.length;
+    $('trainCount').textContent = trains.length;
+    $('pedCount').textContent = pedestrians.length;
+    $('pedRequests').textContent = Object.values(pedestrianRequests).reduce((a, b) => a + b, 0);
   }
 
-  function trainInCrossing(train) {
-    return train.x + train.length / 2 > CONFLICT.left && train.x - train.length / 2 < CONFLICT.right;
+  function allRoadRed() {
+    for (const direction of DIRS) roadSignals[direction] = 'RED';
+    pendingManualRoad = null;
+    roadTransitionUntil = now() + ALL_RED_MS;
+    refreshSignalPanels();
   }
 
-  function pointInsideConflict(x, y) {
-    return x > CONFLICT.left && x < CONFLICT.right && y > CONFLICT.top && y < CONFLICT.bottom;
+  function allPedestrianStop() {
+    for (const direction of DIRS) pedestrianSignals[direction] = 'STOP';
+    refreshPedPanels();
+  }
+
+  function setSystemState(label, message, colour) {
+    $('systemState').textContent = label;
+    $('systemState').style.color = colour;
+    $('status').textContent = message;
+    $('stateTrack').style.background = colour;
+  }
+
+  function railIsBlockedForRoad() {
+    return incident || railPriority || railOccupied || railSignals.A === 'GO' || railSignals.B === 'GO' ||
+      railSensors.A || railSensors.B || trainNearCrossing();
+  }
+
+  function setRoadSignal(direction, aspect, source = 'manual') {
+    if (!DIRS.includes(direction) || !['RED', 'AMBER', 'GREEN'].includes(aspect)) return false;
+    if (source === 'manual' && mode !== 'manual') {
+      addEvent('COMANDO IGNORADO', 'Muda primeiro para o modo manual.');
+      return false;
+    }
+    if (incident && aspect !== 'RED') {
+      addEvent('COMANDO BLOQUEADO', 'A retenção por incidente mantém todas as aproximações em vermelho.');
+      return false;
+    }
+    if (aspect === 'GREEN') {
+      if (railIsBlockedForRoad() || isPedWalking() || anyPedInMotion()) {
+        addEvent('VERDE RECUSADO', 'Prioridade ferroviária ou passagem pedonal activa.');
+        return false;
+      }
+      if (roadSignals[direction] === 'GREEN') return true;
+      const wasAuthorised = DIRS.some((other) => roadSignals[other] !== 'RED');
+      for (const other of DIRS) roadSignals[other] = 'RED';
+      if (wasAuthorised || now() < roadTransitionUntil) {
+        pendingManualRoad = direction;
+        roadTransitionUntil = Math.max(roadTransitionUntil, now() + ALL_RED_MS);
+        refreshSignalPanels();
+        addEvent('VERMELHO INTEGRAL', 'Pedido de verde para ' + DIR_NAMES[direction] + ' em espera até terminar o intervalo de segurança.');
+        return true;
+      }
+      pendingManualRoad = null;
+      roadSignals[direction] = 'GREEN';
+    } else if (aspect === 'AMBER') {
+      pendingManualRoad = null;
+      if (railIsBlockedForRoad() || isPedWalking()) {
+        roadSignals[direction] = 'RED';
+        addEvent('AMARELO RECUSADO', 'A prioridade ferroviária/pedonal mantém o sinal rodoviário em vermelho.');
+        refreshSignalPanels();
+        return false;
+      }
+      for (const other of DIRS) roadSignals[other] = 'RED';
+      roadSignals[direction] = 'AMBER';
+    } else {
+      if (pendingManualRoad === direction) pendingManualRoad = null;
+      const wasAuthorised = roadSignals[direction] !== 'RED';
+      roadSignals[direction] = 'RED';
+      if (wasAuthorised) roadTransitionUntil = Math.max(roadTransitionUntil, now() + ALL_RED_MS);
+    }
+    refreshSignalPanels();
+    addEvent('SEMÁFORO RODOVIÁRIO', DIR_NAMES[direction] + ': ' + aspectName(aspect) + '.');
+    return true;
+  }
+
+  function aspectName(aspect) {
+    return aspect === 'GREEN' ? 'verde' : aspect === 'AMBER' ? 'amarelo' : 'vermelho';
+  }
+
+  function setRailSignal(track, state) {
+    if (!['A', 'B'].includes(track) || !['STOP', 'GO'].includes(state)) return false;
+    if (incident && state === 'GO') {
+      addEvent('AUTORIZAÇÃO FERROVIÁRIA RECUSADA', 'Existe uma retenção por incidente.');
+      return false;
+    }
+    if (state === 'GO') {
+      if (anyCarInConflict() || isPedWalking() || anyPedInMotion()) {
+        addEvent('AUTORIZAÇÃO FERROVIÁRIA RECUSADA', 'A zona de conflito não está livre de veículos/peões.');
+        return false;
+      }
+      allRoadRed();
+      allPedestrianStop();
+      railReadyAt[track] = roadTransitionUntil;
+    } else {
+      railReadyAt[track] = 0;
+    }
+    railSignals[track] = state;
+    for (const train of trains.filter((t) => t.track === track)) {
+      if (state === 'STOP') train.speed = 0;
+    }
+    refreshRailPanels();
+    refreshSignalPanels();
+    addEvent('SINAL FERROVIÁRIO', 'Via ' + track + ': ' + (state === 'GO' ? 'marcha autorizada no simulador' : 'parar') + '.');
+    return true;
+  }
+
+  function requestPedestrian(direction) {
+    if (!DIRS.includes(direction)) return;
+    pedestrianRequests[direction] = Math.min(8, pedestrianRequests[direction] + 1);
+    $('ped' + direction + 'State').textContent = 'PEDIDO PENDENTE';
+    $('ped' + direction + 'State').className = 'aspect-badge amber';
+    updateCounts();
+    addEvent('PEDIDO DE PEÃO', 'Botão de pedido accionado na passadeira ' + DIR_NAMES[direction] + '.');
+    if (mode === 'auto') tryServePedestrian(now());
+  }
+
+  function startPedestrianWalk(direction, source = 'manual') {
+    if (!DIRS.includes(direction)) return false;
+    if (source === 'manual' && mode !== 'manual') {
+      addEvent('COMANDO PEDONAL IGNORADO', 'No modo automático, o ciclo gere os pedidos.');
+      return false;
+    }
+    if (incident || railIsBlockedForRoad() || DIRS.some((d) => roadSignals[d] !== 'RED') || now() < roadTransitionUntil || anyCarInConflict() || hasMovingTrain()) {
+      addEvent('PASSADEIRA BLOQUEADA', 'Não é seguro autorizar peões: existe prioridade ferroviária, incidente ou veículo na zona.');
+      return false;
+    }
+    allRoadRed();
+    for (const key of DIRS) pedestrianSignals[key] = 'STOP';
+    pedestrianSignals[direction] = 'WALK';
+    const amount = Math.max(1, pedestrianRequests[direction]);
+    pedestrianRequests[direction] = 0;
+    for (let i = 0; i < Math.min(amount, 5); i += 1) {
+      pedestrians.push({ direction, progress: i * 0.10, speed: 0.16 + Math.random() * 0.035 });
+    }
+    refreshPedPanels();
+    refreshSignalPanels();
+    addEvent('PASSADEIRA AUTORIZADA', 'Peões autorizados na travessia ' + DIR_NAMES[direction] + '.');
+    updateCounts();
+    return true;
+  }
+
+  function stopPedestrianWalk(direction) {
+    if (!DIRS.includes(direction)) return;
+    pedestrianSignals[direction] = 'STOP';
+    refreshPedPanels();
+    addEvent('PASSADEIRA FECHADA', 'Sinal pedonal ' + DIR_NAMES[direction] + ': não atravessar.');
+  }
+
+  function tryServePedestrian(timestamp) {
+    if (incident || railIsBlockedForRoad() || anyCarInConflict() || anyPedInMotion()) return false;
+    const direction = DIRS.find((d) => pedestrianRequests[d] > 0);
+    if (!direction) return false;
+    autoPedDirection = direction;
+    autoPedUntil = timestamp + PED_WALK_MS;
+    for (const d of DIRS) roadSignals[d] = 'RED';
+    return startPedestrianWalk(direction, mode === 'auto' ? 'auto' : 'manual');
+  }
+
+  function setRailSensor(track, active) {
+    railSensors[track] = Boolean(active);
+    const button = $('sensor' + track);
+    button.setAttribute('aria-pressed', String(active));
+    button.textContent = active ? 'OCUPADA' : 'Livre';
+    button.classList.toggle('on', active);
+    if (active) {
+      allRoadRed();
+      allPedestrianStop();
+      if (!incident) setSystemState('FERROVIA OCUPADA', 'Sensor manual da via ' + track + ' indica ocupação.', 'var(--amber)');
+    }
+    addEvent('SENSOR FERROVIÁRIO', 'Via ' + track + ': ' + (active ? 'ocupada' : 'livre') + '.');
+    updateRailPriority();
+  }
+
+  function setStopSensor(direction, active) {
+    stopSensors[direction] = Boolean(active);
+    const button = document.querySelector('[data-stop-sensor="' + direction + '"]');
+    button.setAttribute('aria-pressed', String(active));
+    button.textContent = active ? 'Activado' : 'Normal';
+    button.classList.toggle('on', active);
+    addEvent('SENSOR DE LINHA', DIR_NAMES[direction] + ': ' + (active ? 'activado' : 'normal') + '.');
+    if (active && roadSignals[direction] !== 'GREEN') triggerIncident('Sensor de linha da aproximação ' + DIR_NAMES[direction] + ' activado com sinal não verde.');
   }
 
   function triggerIncident(reason) {
-    if (incidentHold) return;
-    incidentHold = true;
+    if (incident) return;
+    incident = true;
+    allRoadRed();
+    allPedestrianStop();
+    railSignals.A = 'STOP';
+    railSignals.B = 'STOP';
+    trains.forEach((train) => { train.speed = 0; });
     cars.forEach((car) => { car.vx = 0; car.vy = 0; });
-    trains.forEach((train) => { train.vx = 0; });
-    setText('systemState', 'INCIDENT_HOLD');
-    $('systemState').style.color = 'var(--red)';
-    setText('status', reason);
-    $('stateTrack').style.background = 'var(--red)';
-    $('sensorStop').textContent = 'INCIDENTE';
-    $('sensorStop').style.color = 'var(--red)';
+    refreshSignalPanels();
+    refreshRailPanels();
+    refreshPedPanels();
     $('rearmBtn').disabled = false;
-    appendEvent('INCIDENTE DETECTADO', reason);
-    updateSignals();
+    setSystemState('INCIDENT_HOLD', reason + ' Todas as autorizações ficam retidas até verificação manual.', 'var(--red)');
+    addEvent('INCIDENTE / RETENÇÃO', reason);
   }
 
-  function rearm() {
-    if (!incidentHold) return;
-    if (railOccupied || railApproachActive || cars.some((car) => pointInsideConflict(car.x, car.y))) {
-      setText('status', 'Não é possível rearmar: ainda existem veículos na zona de conflito.');
-      appendEvent('REARME RECUSADO', 'A zona de conflito ainda não está livre.');
+  function rearmIncident() {
+    if (!incident) return;
+    const trainStillNear = trains.some((train) => train.x > 175 && train.x < 925);
+    const sensorStillOccupied = railSensors.A || railSensors.B;
+    if (trainStillNear || sensorStillOccupied || anyCarInConflict() || anyPedInMotion()) {
+      addEvent('REARME RECUSADO', 'Ainda existe ocupação na zona de conflito ou prioridade ferroviária.');
+      setText('status', 'Não é possível rearmar: confirma que a zona está livre e que os sensores estão normalizados.');
       return;
     }
-    incidentHold = false;
-    allRedUntil = performance.now() + ALL_RED_MS;
-    $('systemState').style.color = 'var(--green)';
-    setText('systemState', 'A CONFIRMAR ZONA LIVRE');
-    setText('status', 'Rearme manual aceite. Mantém-se o vermelho integral antes do próximo ciclo.');
-    $('stateTrack').style.background = 'var(--amber)';
-    $('sensorStop').textContent = 'NORMAL';
-    $('sensorStop').style.color = 'var(--green)';
+    incident = false;
+    allRoadRed();
     $('rearmBtn').disabled = true;
-    appendEvent('REARME MANUAL', 'Zona verificada pelo operador da simulação.');
-    updateSignals();
+    setSystemState('VERMELHO INTEGRAL', 'Retenção libertada manualmente. Mantém-se o intervalo de vermelho integral.', 'var(--amber)');
+    addEvent('REARME MANUAL', 'Operador confirmou a zona livre no simulador.');
   }
 
-  function updateSignals() {
-    for (const approach of PHASES) {
-      const signal = $(SIGNAL_IDS[approach]);
-      if (!signal) continue;
-      const green = !incidentHold && !railApproachActive && !railOccupied && performance.now() >= allRedUntil && PHASES[phaseIndex] === approach;
-      signal.classList.toggle('active', green);
-      signal.classList.toggle('red', !green);
+  function refreshSignalPanels() {
+    for (const d of DIRS) {
+      const aspect = roadSignals[d];
+      const badge = $(SIGNAL_IDS[d]);
+      badge.textContent = aspectName(aspect).toUpperCase();
+      badge.className = 'aspect-badge ' + aspect.toLowerCase();
+      const signal = $('sig' + (d === 'O' ? 'W' : d));
+      if (signal) {
+        signal.classList.toggle('active', aspect === 'GREEN');
+        signal.classList.toggle('amber-on', aspect === 'AMBER');
+        signal.classList.toggle('red', aspect === 'RED');
+      }
     }
   }
 
-  function isGreen(approach) {
-    return !incidentHold && !railApproachActive && !railOccupied && performance.now() >= allRedUntil && PHASES[phaseIndex] === approach;
-  }
-
-  function updateRailStatus() {
-    const nextOccupied = trains.some(trainInCrossing);
-    const nextApproach = trains.some(trainInWarningZone);
-    const nextPriority = nextOccupied || nextApproach;
-    railOccupied = nextOccupied;
-    railApproachActive = nextApproach;
-    if (nextPriority !== previousRailPriority) {
-      allRedUntil = performance.now() + ALL_RED_MS;
-      appendEvent(nextPriority ? 'PRIORIDADE FERROVIÁRIA' : 'VIA FERROVIÁRIA LIVRE', nextPriority
-        ? 'Detecção ferroviária activa; entradas rodoviárias bloqueadas.'
-        : 'Comboios fora da zona de detecção; mantém-se o vermelho integral de segurança.');
-      previousRailPriority = nextPriority;
-    }
-    setText('railState', railOccupied ? 'Comboio a ocupar a zona de cruzamento' : railApproachActive ? 'Comboio detectado na aproximação' : 'Via livre · sem comboio na zona');
-    setText('sensorRail', railOccupied ? 'OCUPADA' : railApproachActive ? 'APROXIMAÇÃO' : 'LIVRE');
-    $('railLamp').className = 'lamp ' + (railOccupied ? 'red' : railApproachActive ? 'amber' : 'green');
-  }
-
-  function updatePhase(now) {
-    if (incidentHold || railApproachActive || railOccupied) return;
-    if (now < allRedUntil) return;
-    if (now - phaseStartedAt >= PHASE_MS) {
-      phaseIndex = (phaseIndex + 1) % PHASES.length;
-      phaseStartedAt = now;
-      allRedUntil = now + ALL_RED_MS;
-      appendEvent('MUDANÇA DE FASE', 'Aproximação ' + PHASES[phaseIndex] + ' seleccionada; vermelho integral durante a transição.');
+  function refreshRailPanels() {
+    for (const track of ['A', 'B']) {
+      const state = railSignals[track];
+      const badge = $('rail' + track + 'State');
+      if (badge) {
+        badge.textContent = state === 'GO' ? 'MARCHA' : 'PARAR';
+        badge.className = 'aspect-badge ' + (state === 'GO' ? 'green' : 'red');
+      }
+      const status = $('rail' + track + 'Status');
+      if (status) status.textContent = railSensors[track] ? 'OCUPADA' : trains.some((t) => t.track === track && t.x > 300 && t.x < 800) ? 'COMBOIO NA ZONA' : 'LIVRE';
     }
   }
 
-  function stopLineCrossed(car, nextX, nextY) {
-    switch (car.approach) {
-      case 'N': return car.y < 180 && nextY >= 180 && Math.abs(car.x - 455) < 42;
-      case 'S': return car.y > 500 && nextY <= 500 && Math.abs(car.x - 545) < 42;
-      case 'O': return car.x < 350 && nextX >= 350 && Math.abs(car.y - 325) < 42;
-      case 'E': return car.x > 650 && nextX <= 650 && Math.abs(car.y - 355) < 42;
-      default: return false;
+  function refreshPedPanels() {
+    for (const d of DIRS) {
+      const badge = $(PED_IDS[d]);
+      const state = pedestrianSignals[d];
+      const pending = pedestrianRequests[d] > 0;
+      badge.textContent = state === 'WALK' ? 'ATRAVESSAR' : pending ? 'PEDIDO PENDENTE' : 'NÃO ATRAVESSAR';
+      badge.className = 'aspect-badge ' + (state === 'WALK' ? 'green' : pending ? 'amber' : 'red');
     }
+    updateCounts();
+  }
+
+  function updateRailPriority() {
+    const physical = trains.some((t) => t.x > 175 && t.x < 925);
+    railOccupied = anyRailSensor() || trains.some((t) => t.x > 370 && t.x < 730);
+    const nextPriority = physical || railSensors.A || railSensors.B || railSignals.A === 'GO' || railSignals.B === 'GO';
+    if (nextPriority && !railPriority) {
+      allRoadRed();
+      allPedestrianStop();
+      if (!incident) setSystemState(railOccupied ? 'FERROVIA OCUPADA' : 'PRIORIDADE FERROVIÁRIA', 'Tráfego rodoviário e peões retidos enquanto a via ferroviária estiver autorizada/ocupada.', 'var(--amber)');
+    }
+    railPriority = nextPriority;
+    $('railAStatus').textContent = railSensors.A ? 'OCUPADA' : trains.some((t) => t.track === 'A' && t.x > 300 && t.x < 800) ? 'COMBOIO NA ZONA' : 'LIVRE';
+    $('railBStatus').textContent = railSensors.B ? 'OCUPADA' : trains.some((t) => t.track === 'B' && t.x > 300 && t.x < 800) ? 'COMBOIO NA ZONA' : 'LIVRE';
+    $('conflictStatus').textContent = railOccupied || anyCarInConflict() || anyPedInMotion() ? 'OCUPADA' : 'LIVRE';
+    $('conflictStatus').style.color = railOccupied || anyCarInConflict() || anyPedInMotion() ? 'var(--red)' : 'var(--green)';
+    refreshRailPanels();
+  }
+
+  function createCar(direction = DIRS[cars.length % 4]) {
+    const positions = {
+      N: { x: 470, y: 65, vx: 0, vy: 0 },
+      S: { x: 630, y: 695, vx: 0, vy: 0 },
+      O: { x: 65, y: 365, vx: 0, vy: 0 },
+      E: { x: 1035, y: 435, vx: 0, vy: 0 }
+    };
+    const p = positions[direction];
+    cars.push({ id: cars.length + 1, direction, x: p.x, y: p.y, vx: 0, vy: 0, colour: CAR_COLORS[cars.length % CAR_COLORS.length], crossed: false });
+    selectedCar = cars.length - 1;
+    updateCounts();
+    addEvent('AUTOMÓVEL ADICIONADO', 'Veículo na aproximação ' + DIR_NAMES[direction] + '.');
+  }
+
+  function createTrain(track) {
+    if (trains.some((train) => train.track === track)) {
+      selectedTrain = track;
+      $('trainSelect').value = track;
+      addEvent('COMBOIO JÁ EXISTE', 'A via ' + track + ' já tem um comboio. Foi seleccionado.');
+      return;
+    }
+    const direction = track === 'A' ? 1 : -1;
+    trains.push({ id: track, track, x: direction === 1 ? 90 : W - 90, y: RAIL_Y[track], speed: 0, direction });
+    selectedTrain = track;
+    $('trainSelect').value = track;
+    updateCounts();
+    refreshRailPanels();
+    addEvent('COMBOIO INSERIDO', 'Comboio parado na via ' + track + '. Autoriza a marcha no sinal ferroviário.');
+  }
+
+  function createPedestrian(direction = DIRS[pedestrians.length % 4]) {
+    if (pedestrianSignals[direction] !== 'WALK') {
+      requestPedestrian(direction);
+      return;
+    }
+    pedestrians.push({ direction, progress: Math.random() * 0.04, speed: 0.13 + Math.random() * 0.03 });
+    updateCounts();
+  }
+
+  function pathForPedestrian(ped) {
+    switch (ped.direction) {
+      case 'N': return { x: 405 + 285 * ped.progress, y: 238 };
+      case 'S': return { x: 695 - 285 * ped.progress, y: 556 };
+      case 'O': return { x: 382, y: 548 - 300 * ped.progress };
+      default: return { x: 718, y: 255 + 300 * ped.progress };
+    }
+  }
+
+  function updatePedestrians(dt) {
+    for (const ped of pedestrians) ped.progress += ped.speed * dt / 1000;
+    const before = pedestrians.length;
+    pedestrians = pedestrians.filter((ped) => ped.progress < 1);
+    if (before !== pedestrians.length) {
+      updateCounts();
+      if (!anyPedInMotion()) {
+        for (const d of DIRS) {
+          if (pedestrianSignals[d] === 'WALK') pedestrianSignals[d] = 'STOP';
+        }
+        refreshPedPanels();
+        addEvent('PASSADEIRA LIBERTADA', 'Todos os peões terminaram a travessia.');
+        if (mode === 'auto') {
+          autoPedDirection = null;
+          autoStage = 'ALL_RED';
+          autoStageAt = now();
+        }
+      }
+    }
+  }
+
+  function applyPendingManualRoad(timestamp) {
+    if (mode !== 'manual' || !pendingManualRoad || timestamp < roadTransitionUntil) return;
+    if (railIsBlockedForRoad() || isPedWalking() || anyPedInMotion()) {
+      pendingManualRoad = null;
+      addEvent('VERDE CANCELADO', 'A prioridade ferroviária/pedonal impediu a activação do sinal.');
+      return;
+    }
+    const direction = pendingManualRoad;
+    pendingManualRoad = null;
+    roadSignals[direction] = 'GREEN';
+    refreshSignalPanels();
+    addEvent('VERDE ACTIVADO', 'Intervalo de vermelho concluído na aproximação ' + DIR_NAMES[direction] + '.');
+  }
+
+  function updateAuto(timestamp) {
+    if (mode !== 'auto' || incident) return;
+    if (railPriority || railOccupied) {
+      for (const d of DIRS) roadSignals[d] = 'RED';
+      allPedestrianStop();
+      refreshSignalPanels();
+      return;
+    }
+    if (isPedWalking()) {
+      allRoadRed();
+      return;
+    }
+    const elapsed = timestamp - autoStageAt;
+    if (autoStage === 'GREEN' && elapsed >= PHASE_MS) {
+      roadSignals[DIRS[autoRoadIndex]] = 'AMBER';
+      autoStage = 'AMBER';
+      autoStageAt = timestamp;
+      refreshSignalPanels();
+      addEvent('CICLO AUTOMÁTICO', 'Amarelo na aproximação ' + DIR_NAMES[DIRS[autoRoadIndex]] + '.');
+    } else if (autoStage === 'AMBER' && elapsed >= AMBER_MS) {
+      allRoadRed();
+      autoStage = 'ALL_RED';
+      autoStageAt = timestamp;
+    } else if (autoStage === 'ALL_RED' && elapsed >= ALL_RED_MS) {
+      if (Object.values(pedestrianRequests).some((count) => count > 0)) {
+        const d = DIRS.find((direction) => pedestrianRequests[direction] > 0);
+        if (d) {
+          startPedestrianWalk(d, 'auto');
+          autoPedDirection = d;
+          autoPedUntil = timestamp + PED_WALK_MS;
+          autoStageAt = timestamp;
+        }
+      } else {
+        autoRoadIndex = (autoRoadIndex + 1) % 4;
+        roadSignals[DIRS[autoRoadIndex]] = 'GREEN';
+        autoStage = 'GREEN';
+        autoStageAt = timestamp;
+        refreshSignalPanels();
+        addEvent('CICLO AUTOMÁTICO', 'Verde na aproximação ' + DIR_NAMES[DIRS[autoRoadIndex]] + '.');
+      }
+    }
+    if (autoPedDirection && timestamp >= autoPedUntil && !anyPedInMotion()) {
+      stopPedestrianWalk(autoPedDirection);
+      autoPedDirection = null;
+      autoRoadIndex = (autoRoadIndex + 1) % 4;
+      roadSignals[DIRS[autoRoadIndex]] = 'GREEN';
+      autoStage = 'GREEN';
+      autoStageAt = timestamp;
+      refreshSignalPanels();
+    }
+  }
+
+  function lineCrossed(car, nx, ny) {
+    if (car.direction === 'N') return car.y < 220 && ny >= 220;
+    if (car.direction === 'S') return car.y > 580 && ny <= 580;
+    if (car.direction === 'O') return car.x < 385 && nx >= 385;
+    return car.x > 715 && nx <= 715;
   }
 
   function moveCars(dt) {
+    if (paused || incident) return;
     const seconds = dt / 1000;
     for (const car of cars) {
       if (car.vx === 0 && car.vy === 0) continue;
-      const nextX = car.x + car.vx * seconds;
-      const nextY = car.y + car.vy * seconds;
-      if (!car.enteredIntersection && stopLineCrossed(car, nextX, nextY)) {
-        if (!isGreen(car.approach)) {
-          triggerIncident('Passagem pela linha de paragem da aproximação ' + car.approach + ' com sinal vermelho ou prioridade ferroviária activa.');
+      const nx = clamp(car.x + car.vx * seconds, -100, W + 100);
+      const ny = clamp(car.y + car.vy * seconds, -100, H + 100);
+      if (!car.crossed && lineCrossed(car, nx, ny)) {
+        if (roadSignals[car.direction] !== 'GREEN' || railPriority || isPedWalking()) {
+          triggerIncident('Automóvel atravessou a linha de paragem ' + DIR_NAMES[car.direction] + ' sem autorização.');
           return;
         }
-        car.enteredIntersection = true;
-        appendEvent('VEÍCULO AUTORIZADO', 'Veículo da aproximação ' + car.approach + ' entrou durante a fase verde.');
+        car.crossed = true;
+        addEvent('PASSAGEM AUTORIZADA', 'Automóvel atravessou a linha de paragem ' + DIR_NAMES[car.direction] + ' com verde.');
       }
-      if (pointInsideConflict(nextX, nextY) && (railApproachActive || railOccupied)) {
-        triggerIncident('Veículo rodoviário entrou na zona de conflito durante detecção ferroviária.');
+      if (nx > CONFLICT.left && nx < CONFLICT.right && ny > CONFLICT.top && ny < CONFLICT.bottom && (railPriority || isPedWalking())) {
+        triggerIncident('Veículo rodoviário entrou numa zona com prioridade ferroviária/pedonal.');
         return;
       }
-      car.x = nextX;
-      car.y = nextY;
-      if (car.x < -80 || car.x > W + 80 || car.y < -80 || car.y > H + 80) {
+      car.x = nx;
+      car.y = ny;
+      if (car.x <= -99 || car.x >= W + 99 || car.y <= -99 || car.y >= H + 99) {
         car.vx = 0;
         car.vy = 0;
       }
     }
   }
 
-  function detectCollision() {
+  function moveTrains(dt) {
+    if (paused || incident) return;
+    const seconds = dt / 1000;
+    for (const train of trains) {
+      if (Math.abs(train.speed) < 0.01) continue;
+      if (railSignals[train.track] !== 'GO' || now() < railReadyAt[train.track]) {
+        train.speed = 0;
+        addEvent('COMBOIO RETIDO', 'A via ' + train.track + ' tem o sinal em PARAR.');
+        continue;
+      }
+      if (anyCarInConflict() || isPedWalking() || anyPedInMotion()) {
+        train.speed = 0;
+        addEvent('COMBOIO RETIDO', 'A zona de conflito não está livre.');
+        continue;
+      }
+      train.x += train.speed * seconds;
+      if (train.x < -140 || train.x > W + 140) {
+        train.x = train.x < 0 ? -140 : W + 140;
+        train.speed = 0;
+        addEvent('COMBOIO SAIU DA ZONA', 'A via ' + train.track + ' ficou sem comboio em movimento.');
+      }
+    }
+  }
+
+  function detectConflicts() {
     for (const car of cars) {
-      if (!pointInsideConflict(car.x, car.y)) continue;
+      if (car.x < CONFLICT.left || car.x > CONFLICT.right || car.y < CONFLICT.top || car.y > CONFLICT.bottom) continue;
       for (const train of trains) {
-        if (Math.abs(car.x - train.x) < 62 && Math.abs(car.y - train.y) < 34) {
-          triggerIncident('Conflito espacial entre automóvel e comboio detectado na simulação.');
+        if (Math.abs(car.x - train.x) < 92 && Math.abs(car.y - train.y) < 38) {
+          triggerIncident('Conflito geométrico entre automóvel e comboio na simulação.');
           return;
         }
       }
     }
   }
 
-  function roundedRect(x, y, width, height, radius) {
+  function roundRect(x, y, width, height, radius) {
     const r = Math.min(radius, width / 2, height / 2);
     ctx.beginPath();
-    ctx.moveTo(x + r, y);
-    ctx.lineTo(x + width - r, y);
-    ctx.quadraticCurveTo(x + width, y, x + width, y + r);
-    ctx.lineTo(x + width, y + height - r);
-    ctx.quadraticCurveTo(x + width, y + height, x + width - r, y + height);
-    ctx.lineTo(x + r, y + height);
-    ctx.quadraticCurveTo(x, y + height, x, y + height - r);
-    ctx.lineTo(x, y + r);
-    ctx.quadraticCurveTo(x, y, x + r, y);
-    ctx.closePath();
+    ctx.moveTo(x + r, y); ctx.lineTo(x + width - r, y); ctx.quadraticCurveTo(x + width, y, x + width, y + r);
+    ctx.lineTo(x + width, y + height - r); ctx.quadraticCurveTo(x + width, y + height, x + width - r, y + height);
+    ctx.lineTo(x + r, y + height); ctx.quadraticCurveTo(x, y + height, x, y + height - r);
+    ctx.lineTo(x, y + r); ctx.quadraticCurveTo(x, y, x + r, y); ctx.closePath();
   }
 
   function drawRoad() {
-    ctx.fillStyle = '#172a25';
-    ctx.fillRect(0, 0, W, H);
-    ctx.fillStyle = '#263541';
-    ctx.fillRect(350, 0, 300, H);
-    ctx.fillRect(0, 190, W, 300);
-    ctx.fillStyle = '#31404a';
-    ctx.fillRect(350, 190, 300, 300);
+    ctx.fillStyle = '#172a25'; ctx.fillRect(0, 0, W, H);
+    ctx.fillStyle = '#263541'; ctx.fillRect(390, 0, 320, H); ctx.fillRect(0, 245, W, 305);
+    ctx.fillStyle = '#31404a'; ctx.fillRect(390, 245, 320, 305);
 
-    ctx.strokeStyle = '#9baab2';
-    ctx.lineWidth = 2;
-    ctx.setLineDash([18, 15]);
-    ctx.beginPath();
-    ctx.moveTo(400, 0); ctx.lineTo(400, 190);
-    ctx.moveTo(600, 0); ctx.lineTo(600, 190);
-    ctx.moveTo(400, 490); ctx.lineTo(400, H);
-    ctx.moveTo(600, 490); ctx.lineTo(600, H);
-    ctx.moveTo(0, 240); ctx.lineTo(350, 240);
-    ctx.moveTo(650, 240); ctx.lineTo(W, 240);
-    ctx.moveTo(0, 440); ctx.lineTo(350, 440);
-    ctx.moveTo(650, 440); ctx.lineTo(W, 440);
-    ctx.stroke();
-    ctx.setLineDash([]);
+    ctx.strokeStyle = '#9baab2'; ctx.lineWidth = 2; ctx.setLineDash([18, 15]); ctx.beginPath();
+    ctx.moveTo(450, 0); ctx.lineTo(450, 245); ctx.moveTo(650, 0); ctx.lineTo(650, 245);
+    ctx.moveTo(450, 550); ctx.lineTo(450, H); ctx.moveTo(650, 550); ctx.lineTo(650, H);
+    ctx.moveTo(0, 295); ctx.lineTo(390, 295); ctx.moveTo(710, 295); ctx.lineTo(W, 295);
+    ctx.moveTo(0, 500); ctx.lineTo(390, 500); ctx.moveTo(710, 500); ctx.lineTo(W, 500); ctx.stroke(); ctx.setLineDash([]);
 
-    // Duas vias ferroviárias paralelas, com carris e travessas.
-    ctx.fillStyle = '#1b2b36';
-    ctx.fillRect(0, 250, W, 42);
-    ctx.fillRect(0, 388, W, 42);
-    ctx.strokeStyle = '#e8bd70';
-    ctx.lineWidth = 5;
-    for (let x = 0; x < W; x += 34) {
-      ctx.beginPath();
-      ctx.moveTo(x, 251); ctx.lineTo(x + 18, 251);
-      ctx.moveTo(x, 291); ctx.lineTo(x + 18, 291);
-      ctx.moveTo(x, 389); ctx.lineTo(x + 18, 389);
-      ctx.moveTo(x, 429); ctx.lineTo(x + 18, 429);
-      ctx.stroke();
+    for (const y of [RAIL_Y.A, RAIL_Y.B]) {
+      ctx.fillStyle = '#16242f'; ctx.fillRect(0, y - 25, W, 50);
+      ctx.strokeStyle = '#d4a34c'; ctx.lineWidth = 4;
+      for (let x = 0; x < W; x += 34) { ctx.beginPath(); ctx.moveTo(x, y - 24); ctx.lineTo(x + 18, y - 24); ctx.moveTo(x, y + 24); ctx.lineTo(x + 18, y + 24); ctx.stroke(); }
+      ctx.strokeStyle = '#9caab2'; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(0, y - 13); ctx.lineTo(W, y - 13); ctx.moveTo(0, y + 13); ctx.lineTo(W, y + 13); ctx.stroke();
     }
-    ctx.strokeStyle = '#a6b4bd';
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.moveTo(0, 260); ctx.lineTo(W, 260);
-    ctx.moveTo(0, 282); ctx.lineTo(W, 282);
-    ctx.moveTo(0, 398); ctx.lineTo(W, 398);
-    ctx.moveTo(0, 420); ctx.lineTo(W, 420);
-    ctx.stroke();
+    ctx.fillStyle = '#e4edf2'; ctx.font = 'bold 14px system-ui';
+    ctx.fillText('VIA FERROVIÁRIA A', 20, RAIL_Y.A - 34); ctx.fillText('VIA FERROVIÁRIA B', 20, RAIL_Y.B - 34);
+    ctx.fillText('N', 540, 30); ctx.fillText('S', 540, 744); ctx.fillText('O', 20, 395); ctx.fillText('E', 1065, 395);
 
-    ctx.fillStyle = '#e7edf0';
-    ctx.font = 'bold 15px system-ui';
-    ctx.fillText('N', 485, 35);
-    ctx.fillText('S', 485, 660);
-    ctx.fillText('O', 20, 345);
-    ctx.fillText('E', 965, 345);
+    // Passadeiras: Norte e Sul atravessam os braços verticais; Este e Oeste os horizontais.
+    for (let x = 405; x < 700; x += 18) { ctx.fillStyle = '#e7e9ec'; ctx.fillRect(x, 225, 10, 24); ctx.fillRect(x, 550, 10, 24); }
+    for (let y = 258; y < 545; y += 18) { ctx.fillStyle = '#e7e9ec'; ctx.fillRect(375, y, 24, 10); ctx.fillRect(701, y, 24, 10); }
 
-    const stopMarkers = [
-      { x: 455, y: 180, approach: 'N' },
-      { x: 545, y: 500, approach: 'S' },
-      { x: 350, y: 325, approach: 'O' },
-      { x: 650, y: 355, approach: 'E' }
+    // Linhas de paragem e semáforos rodoviários.
+    const roadSignalsDraw = [
+      { d: 'N', x: 770, y: 220 }, { d: 'S', x: 330, y: 585 },
+      { d: 'O', x: 365, y: 210 }, { d: 'E', x: 735, y: 585 }
     ];
-    for (const marker of stopMarkers) {
-      ctx.fillStyle = isGreen(marker.approach) ? '#45cf91' : '#fa6670';
-      ctx.beginPath(); ctx.arc(marker.x, marker.y, 8, 0, Math.PI * 2); ctx.fill();
-      ctx.fillStyle = '#dce6eb'; ctx.font = '10px system-ui';
-      ctx.fillText('STOP', marker.x - 15, marker.y + (marker.approach === 'N' ? -15 : 23));
+    for (const item of roadSignalsDraw) {
+      ctx.fillStyle = '#e7edf0'; ctx.fillRect(item.x - 13, item.y - 2, 26, 4);
+      drawTrafficSignal(item.x, item.y, roadSignals[item.d]);
+      ctx.fillStyle = '#dce6eb'; ctx.font = '11px system-ui'; ctx.fillText(item.d, item.x - 4, item.y + 42);
     }
-    ctx.strokeStyle = incidentHold ? '#fa6670' : '#45cf91';
-    ctx.lineWidth = 2;
+
+    // Sinais ferroviários das duas vias.
+    drawRailSignal(130, RAIL_Y.A, railSignals.A);
+    drawRailSignal(970, RAIL_Y.B, railSignals.B);
+    drawPedSignal(745, 230, pedestrianSignals.N);
+    drawPedSignal(350, 570, pedestrianSignals.S);
+    drawPedSignal(370, 590, pedestrianSignals.O);
+    drawPedSignal(730, 220, pedestrianSignals.E);
+
+    ctx.strokeStyle = incident ? '#fa6670' : '#45cf91'; ctx.lineWidth = 2;
     ctx.strokeRect(CONFLICT.left, CONFLICT.top, CONFLICT.right - CONFLICT.left, CONFLICT.bottom - CONFLICT.top);
+    if (incident) {
+      ctx.fillStyle = 'rgba(250,102,112,0.2)'; ctx.fillRect(CONFLICT.left, CONFLICT.top, CONFLICT.right - CONFLICT.left, CONFLICT.bottom - CONFLICT.top);
+      ctx.fillStyle = '#fff'; ctx.font = 'bold 24px system-ui'; ctx.fillText('INCIDENT HOLD', 470, 405);
+    }
+  }
+
+  function drawTrafficSignal(x, y, aspect) {
+    ctx.fillStyle = '#111820'; roundRect(x - 13, y - 31, 26, 54, 7); ctx.fill();
+    const colours = { RED: '#fa6670', AMBER: '#f3b84b', GREEN: '#45cf91' };
+    const positions = [{ y: y - 21, key: 'RED' }, { y: y - 4, key: 'AMBER' }, { y: y + 13, key: 'GREEN' }];
+    for (const p of positions) {
+      ctx.beginPath(); ctx.fillStyle = p.key === aspect ? colours[p.key] : '#3c4a55'; ctx.arc(x, p.y, 5, 0, Math.PI * 2); ctx.fill();
+    }
+  }
+
+  function drawRailSignal(x, y, state) {
+    ctx.fillStyle = '#101820'; roundRect(x - 8, y - 35, 16, 30, 4); ctx.fill();
+    ctx.beginPath(); ctx.fillStyle = state === 'GO' ? '#45cf91' : '#fa6670'; ctx.arc(x, y - 25, 5, 0, Math.PI * 2); ctx.fill();
+    ctx.strokeStyle = '#778b99'; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(x, y - 5); ctx.lineTo(x, y + 18); ctx.stroke();
+  }
+
+  function drawPedSignal(x, y, state) {
+    ctx.fillStyle = '#101820'; roundRect(x - 9, y - 14, 18, 28, 4); ctx.fill();
+    ctx.beginPath(); ctx.fillStyle = state === 'WALK' ? '#45cf91' : '#fa6670'; ctx.arc(x, y - 5, 4, 0, Math.PI * 2); ctx.fill();
+    ctx.strokeStyle = ctx.fillStyle; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x, y + 7); ctx.moveTo(x, y + 2); ctx.lineTo(x - 4, y + 6); ctx.moveTo(x, y + 2); ctx.lineTo(x + 4, y + 6); ctx.stroke();
   }
 
   function drawCar(car, index) {
-    ctx.save();
-    ctx.translate(car.x, car.y);
-    const vertical = car.approach === 'N' || car.approach === 'S';
-    if (vertical) ctx.rotate(Math.PI / 2);
-    ctx.fillStyle = car.color;
-    roundedRect(-22, -11, 44, 22, 6);
-    ctx.fill();
-    ctx.fillStyle = '#b8e8f2';
-    ctx.fillRect(-9, -8, 16, 16);
-    ctx.fillStyle = '#14212a';
-    ctx.fillRect(-16, -14, 9, 4);
-    ctx.fillRect(8, -14, 9, 4);
-    ctx.fillRect(-16, 10, 9, 4);
-    ctx.fillRect(8, 10, 9, 4);
-    if (index === selectedCar) {
-      ctx.strokeStyle = '#fff';
-      ctx.lineWidth = 2;
-      ctx.strokeRect(-26, -16, 52, 32);
-    }
+    ctx.save(); ctx.translate(car.x, car.y);
+    if (car.direction === 'N' || car.direction === 'S') ctx.rotate(Math.PI / 2);
+    ctx.fillStyle = car.colour; roundRect(-23, -12, 46, 24, 6); ctx.fill();
+    ctx.fillStyle = '#b8e8f2'; ctx.fillRect(-9, -9, 17, 18);
+    ctx.fillStyle = '#111820'; ctx.fillRect(-16, -15, 9, 4); ctx.fillRect(8, -15, 9, 4); ctx.fillRect(-16, 11, 9, 4); ctx.fillRect(8, 11, 9, 4);
+    if (index === selectedCar) { ctx.strokeStyle = '#fff'; ctx.lineWidth = 2; ctx.strokeRect(-27, -16, 54, 32); }
     ctx.restore();
   }
 
   function drawTrain(train) {
-    ctx.fillStyle = '#f2b632';
-    roundedRect(train.x - 55, train.y - 16, 110, 32, 8);
-    ctx.fill();
-    ctx.fillStyle = '#bce8f4';
-    for (let i = 0; i < 3; i += 1) ctx.fillRect(train.x - 42 + i * 29, train.y - 10, 22, 13);
-    ctx.fillStyle = '#17232d';
-    ctx.beginPath();
-    ctx.arc(train.x - 35, train.y + 16, 5, 0, Math.PI * 2);
-    ctx.arc(train.x + 35, train.y + 16, 5, 0, Math.PI * 2);
-    ctx.fill();
+    ctx.save(); ctx.translate(train.x, train.y); if (train.speed < 0) ctx.scale(-1, 1);
+    for (let i = 0; i < 4; i += 1) {
+      const x = -95 + i * 47;
+      ctx.fillStyle = i === 0 ? '#f2b632' : '#d99f2d';
+      roundRect(x, -17, 43, 34, 6); ctx.fill();
+      ctx.fillStyle = '#bce8f4'; ctx.fillRect(x + 6, -11, 13, 11); ctx.fillRect(x + 24, -11, 13, 11);
+      ctx.fillStyle = '#17232d'; ctx.beginPath(); ctx.arc(x + 10, 17, 4, 0, Math.PI * 2); ctx.arc(x + 33, 17, 4, 0, Math.PI * 2); ctx.fill();
+    }
+    ctx.restore();
+    if (selectedTrain === train.track) { ctx.strokeStyle = '#fff'; ctx.lineWidth = 2; ctx.strokeRect(train.x - 100, train.y - 22, 200, 44); }
+    ctx.fillStyle = '#fff'; ctx.font = 'bold 10px system-ui'; ctx.fillText('COMBOIO ' + train.track, train.x - 35, train.y - 28);
+  }
+
+  function drawPedestrian(ped) {
+    const point = pedPosition(ped);
+    ctx.strokeStyle = '#f6f0ff'; ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.arc(point.x, point.y - 7, 4, 0, Math.PI * 2); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(point.x, point.y - 3); ctx.lineTo(point.x, point.y + 8); ctx.moveTo(point.x, point.y + 1); ctx.lineTo(point.x - 6, point.y + 5); ctx.moveTo(point.x, point.y + 1); ctx.lineTo(point.x + 6, point.y + 5); ctx.moveTo(point.x, point.y + 8); ctx.lineTo(point.x - 5, point.y + 14); ctx.moveTo(point.x, point.y + 8); ctx.lineTo(point.x + 5, point.y + 14); ctx.stroke();
+  }
+
+  function pedPosition(ped) {
+    const p = ped.progress;
+    if (ped.direction === 'N') return { x: 400 + p * 300, y: 236 };
+    if (ped.direction === 'S') return { x: 700 - p * 300, y: 562 };
+    if (ped.direction === 'O') return { x: 386, y: 555 - p * 300 };
+    return { x: 714, y: 250 + p * 300 };
   }
 
   function draw() {
@@ -493,192 +805,210 @@ footer{border-top:1px solid var(--line);padding:15px 25px;text-align:center;colo
     drawRoad();
     trains.forEach(drawTrain);
     cars.forEach(drawCar);
-    if (incidentHold) {
-      ctx.fillStyle = 'rgba(250, 102, 112, 0.18)';
-      ctx.fillRect(CONFLICT.left, CONFLICT.top, CONFLICT.right - CONFLICT.left, CONFLICT.bottom - CONFLICT.top);
-      ctx.fillStyle = '#fff';
-      ctx.font = 'bold 24px system-ui';
-      ctx.fillText('INCIDENT HOLD', 405, 340);
-    }
+    pedestrians.forEach(drawPedestrian);
   }
 
-  function updateTrain(dt) {
-    if (paused || incidentHold) return;
-    const seconds = dt / 1000;
-    for (const train of trains) {
-      train.x += train.vx * seconds;
-      if (train.x < -180 || train.x > W + 180) {
-        train.vx = 0;
-        train.x = Math.max(-180, Math.min(W + 180, train.x));
-      }
-    }
-  }
-
-  function updateUptime(now) {
-    const elapsed = Math.max(0, Math.floor((now - startedAt) / 1000));
-    const minutes = String(Math.floor(elapsed / 60)).padStart(2, '0');
-    const seconds = String(elapsed % 60).padStart(2, '0');
-    setText('uptime', minutes + ':' + seconds);
-  }
-
-  function updateSystemPanel() {
-    if (incidentHold) return;
-    const allRed = railApproachActive || railOccupied || performance.now() < allRedUntil;
-    if (allRed) {
-      $('systemState').textContent = railOccupied ? 'FERROVIA OCUPADA' : railApproachActive ? 'PRIORIDADE FERROVIÁRIA' : 'VERMELHO INTEGRAL';
-      $('systemState').style.color = 'var(--amber)';
-      $('stateTrack').style.background = 'var(--amber)';
-      setText('status', railOccupied ? 'Comboio na zona de conflito. Entradas rodoviárias bloqueadas.' : railApproachActive ? 'Comboio detectado. A aguardar libertação da zona.' : 'Transição de segurança entre fases.');
+  function updateStatus() {
+    if (incident) return;
+    if (railOccupied || railPriority) {
+      setSystemState(railOccupied ? 'FERROVIA OCUPADA' : 'PRIORIDADE FERROVIÁRIA', 'Sinais rodoviários e pedonais retidos por prioridade ferroviária.', 'var(--amber)');
+    } else if (isPedWalking()) {
+      setSystemState('PASSADEIRA ACTIVA', 'Peões autorizados a atravessar. Tráfego rodoviário retido.', 'var(--purple)');
+    } else if (mode === 'manual') {
+      const active = DIRS.find((d) => roadSignals[d] === 'GREEN' || roadSignals[d] === 'AMBER');
+      setSystemState(active ? 'MANUAL · ' + DIR_NAMES[active].toUpperCase() : 'MANUAL · VERMELHO', active ? 'Comando manual activo na aproximação ' + DIR_NAMES[active] + '.' : 'Todas as aproximações rodoviárias estão em vermelho.', active ? (roadSignals[active] === 'GREEN' ? 'var(--green)' : 'var(--amber)') : 'var(--muted)');
     } else {
-      $('systemState').textContent = 'FASE ' + PHASES[phaseIndex];
-      $('systemState').style.color = 'var(--green)';
-      $('stateTrack').style.background = 'var(--green)';
-      setText('status', 'Circulação autorizada na aproximação ' + PHASES[phaseIndex] + '.');
+      const active = DIRS.find((d) => roadSignals[d] === 'GREEN' || roadSignals[d] === 'AMBER');
+      setSystemState('AUTOMÁTICO · ' + (active ? DIR_NAMES[active].toUpperCase() : 'TRANSIÇÃO'), 'Ciclo automático demonstrativo.', 'var(--cyan)');
     }
   }
 
-  function attachEvents() {
+  function updateUptime() {
+    const sec = Math.floor((Date.now() - startedAt) / 1000);
+    $('uptime').textContent = String(Math.floor(sec / 60)).padStart(2, '0') + ':' + String(sec % 60).padStart(2, '0');
+  }
+
+  function transmitLora() {
+    packetSequence += 1;
+    const payload = {
+      node: 'ESP32-JUNCTION-01',
+      seq: packetSequence,
+      timestamp: new Date().toISOString(),
+      event: 'STATUS',
+      mode,
+      road: roadSignals,
+      rail: railSignals,
+      pedestrian: pedestrianSignals,
+      occupancy: { railA: railSensors.A, railB: railSensors.B },
+      counts: { cars: cars.length, trains: trains.length, pedestrians: pedestrians.length, pendingPedestrianRequests: Object.values(pedestrianRequests).reduce((a, b) => a + b, 0) },
+      incident
+    };
+    $('loraLink').textContent = 'Pacote simulado';
+    $('loraRssi').textContent = (-65 - Math.floor(Math.random() * 24)) + ' dBm';
+    $('loraSnr').textContent = (4 + Math.floor(Math.random() * 8)) + ' dB';
+    $('loraPackets').textContent = packetSequence;
+    $('loraPayload').textContent = JSON.stringify(payload, null, 2);
+    addEvent('LoRa TX SIMULADO', 'Pacote ' + packetSequence + ' preparado. Nenhuma transmissão RF foi efectuada.');
+  }
+
+  function bindControls() {
+    document.querySelectorAll('[data-road][data-aspect]').forEach((button) => button.addEventListener('click', () => {
+      setRoadSignal(button.dataset.road, button.dataset.aspect);
+    }));
+    document.querySelectorAll('[data-rail][data-state]').forEach((button) => button.addEventListener('click', () => {
+      setRailSignal(button.dataset.rail, button.dataset.state);
+    }));
+    document.querySelectorAll('[data-ped-request]').forEach((button) => button.addEventListener('click', () => requestPedestrian(button.dataset.pedRequest)));
+    document.querySelectorAll('[data-ped-state]').forEach((button) => button.addEventListener('click', () => {
+      const direction = button.dataset.pedState;
+      if (button.dataset.state === 'WALK') startPedestrianWalk(direction);
+      else stopPedestrianWalk(direction);
+    }));
+    document.querySelectorAll('[data-stop-sensor]').forEach((button) => button.addEventListener('click', () => {
+      const d = button.dataset.stopSensor;
+      setStopSensor(d, !stopSensors[d]);
+    }));
+    $('sensorA').addEventListener('click', () => setRailSensor('A', !railSensors.A));
+    $('sensorB').addEventListener('click', () => setRailSensor('B', !railSensors.B));
     $('addCar').addEventListener('click', () => createCar());
-    $('addTrain').addEventListener('click', createTrain);
-    $('violation').addEventListener('click', () => triggerIncident('Infração simulada pelo operador. Todas as entradas são bloqueadas.'));
-    $('reset').addEventListener('click', reset);
-    $('rearmBtn').addEventListener('click', rearm);
+    $('addTrainA').addEventListener('click', () => createTrain('A'));
+    $('addTrainB').addEventListener('click', () => createTrain('B'));
+    $('addPed').addEventListener('click', () => createPedestrian());
     $('clearVehicles').addEventListener('click', () => {
-      cars = [];
-      trains = [];
-      updateMetrics();
-      appendEvent('VEÍCULOS REMOVIDOS', 'Todas as entidades foram removidas da pista.');
+      cars = []; pedestrians = []; trains = [];
+      railSensors = { A: false, B: false };
+      $('sensorA').setAttribute('aria-pressed', 'false'); $('sensorA').textContent = 'Livre'; $('sensorA').classList.remove('on');
+      $('sensorB').setAttribute('aria-pressed', 'false'); $('sensorB').textContent = 'Livre'; $('sensorB').classList.remove('on');
+      updateCounts(); refreshRailPanels(); addEvent('SIMULAÇÃO LIMPA', 'Veículos, comboios, peões e ocupações simuladas removidos.');
     });
-    $('clearLog').addEventListener('click', () => {
-      events = [];
-      setText('eventCount', '0');
-      $('eventLog').replaceChildren();
-      const li = document.createElement('li');
-      li.className = 'empty';
-      li.textContent = 'Sem ocorrências nesta sessão.';
-      $('eventLog').append(li);
+    $('violation').addEventListener('click', () => triggerIncident('Infração simulada pelo operador.'));
+    $('rearmBtn').addEventListener('click', rearmIncident);
+    $('trainStop').addEventListener('click', () => {
+      const train = trains.find((t) => t.track === selectedTrain);
+      if (train) train.speed = 0;
+      addEvent('COMANDO DE PARAGEM', 'Pedido de paragem ao comboio da via ' + selectedTrain + '.');
     });
+    $('trainSelect').addEventListener('change', (event) => { selectedTrain = event.target.value; });
     $('pauseBtn').addEventListener('click', () => {
       paused = !paused;
       $('pauseBtn').textContent = paused ? '▶ Retomar' : 'Ⅱ Pausar';
-      appendEvent(paused ? 'SIMULAÇÃO PAUSADA' : 'SIMULAÇÃO RETOMADA', 'Controlo manual do simulador.');
+      addEvent(paused ? 'SIMULAÇÃO PAUSADA' : 'SIMULAÇÃO RETOMADA', 'Estado do simulador alterado pelo operador.');
+    });
+    $('reset').addEventListener('click', reset);
+    $('modeSelect').addEventListener('change', (event) => {
+      mode = event.target.value;
+      allRoadRed();
+      allPedestrianStop();
+      if (mode === 'auto') {
+        autoRoadIndex = 3; autoStage = 'ALL_RED'; autoStageAt = now();
+        refreshSignalPanels();
+        addEvent('MODO AUTOMÁTICO', 'Ciclo sequencial demonstrativo activado após vermelho integral.');
+      } else {
+        addEvent('MODO MANUAL', 'Comandos individuais dos sinais disponíveis.');
+      }
+    });
+    $('sendLora').addEventListener('click', transmitLora);
+    $('clearLog').addEventListener('click', () => {
+      events = [];
+      $('eventCount').textContent = '0';
+      $('eventLog').replaceChildren();
+      const li = document.createElement('li'); li.className = 'empty'; li.textContent = 'Sem ocorrências nesta sessão.';
+      $('eventLog').append(li);
     });
 
     window.addEventListener('keydown', (event) => {
       const arrows = ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'];
-      if (event.key === ' ') {
-        event.preventDefault();
-        $('pauseBtn').click();
-        return;
+      if (event.key === ' ' && !['INPUT', 'SELECT', 'TEXTAREA'].includes(document.activeElement.tagName)) {
+        event.preventDefault(); $('pauseBtn').click(); return;
       }
-      if (event.key === 'Tab') {
-        if (cars.length) {
-          event.preventDefault();
-          selectedCar = (selectedCar + 1) % cars.length;
-        }
-        return;
+      if (event.key === 'Tab' && cars.length && !['INPUT', 'SELECT', 'TEXTAREA', 'BUTTON'].includes(document.activeElement.tagName)) {
+        event.preventDefault(); selectedCar = (selectedCar + 1) % cars.length; return;
       }
-      if (!arrows.includes(event.key)) return;
+      if (!arrows.includes(event.key) || paused || incident) return;
       event.preventDefault();
-      if (paused || incidentHold) return;
-      const vector = {
-        ArrowUp: { x: 0, y: -150 },
-        ArrowDown: { x: 0, y: 150 },
-        ArrowLeft: { x: -150, y: 0 },
-        ArrowRight: { x: 150, y: 0 }
-      }[event.key];
       if (event.shiftKey) {
-        const train = trains[trains.length - 1];
-        if (!train) {
-          appendEvent('SEM COMBOIO SELECCIONADO', 'Adicione primeiro um comboio para o controlar.');
-          return;
-        }
-        if (vector.x !== 0) {
-          train.vx = vector.x;
-          train.controlled = true;
-        }
+        const train = trains.find((t) => t.track === selectedTrain);
+        if (!train) { addEvent('SEM COMBOIO', 'Insere primeiro um comboio na via seleccionada.'); return; }
+        if (railSignals[train.track] !== 'GO') { train.speed = 0; addEvent('COMBOIO RETIDO', 'Autoriza primeiro o sinal ferroviário da via ' + train.track + '.'); return; }
+        if (now() < railReadyAt[train.track]) { train.speed = 0; addEvent('INTERVALO DE SEGURANÇA', 'Aguarda o fim do vermelho integral antes da marcha.'); return; }
+        if (event.key === 'ArrowRight') train.speed = 125;
+        if (event.key === 'ArrowLeft') train.speed = -125;
         return;
       }
       const car = cars[selectedCar];
-      if (car) {
-        car.vx = vector.x;
-        car.vy = vector.y;
-      }
+      if (!car) return;
+      const speed = 125;
+      if (event.key === 'ArrowUp') { car.vx = 0; car.vy = -speed; }
+      if (event.key === 'ArrowDown') { car.vx = 0; car.vy = speed; }
+      if (event.key === 'ArrowLeft') { car.vx = -speed; car.vy = 0; }
+      if (event.key === 'ArrowRight') { car.vx = speed; car.vy = 0; }
     });
 
     window.addEventListener('keyup', (event) => {
-      const arrows = ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'];
-      if (!arrows.includes(event.key)) return;
-      const vector = {
-        ArrowUp: { x: 0, y: -1 },
-        ArrowDown: { x: 0, y: 1 },
-        ArrowLeft: { x: -1, y: 0 },
-        ArrowRight: { x: 1, y: 0 }
-      }[event.key];
-      const train = trains[trains.length - 1];
-      if (train && vector.x !== 0 && train.controlled) {
-        train.vx = 0;
-        train.controlled = false;
+      if (!['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(event.key)) return;
+      if (event.shiftKey || event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
+        const train = trains.find((t) => t.track === selectedTrain);
+        if (train) train.speed = 0;
       }
       const car = cars[selectedCar];
-      if (car) {
-        if (vector.x !== 0 && Math.sign(car.vx) === vector.x) car.vx = 0;
-        if (vector.y !== 0 && Math.sign(car.vy) === vector.y) car.vy = 0;
-      }
+      if (car) { car.vx = 0; car.vy = 0; }
+    });
+    window.addEventListener('blur', () => {
+      cars.forEach((car) => { car.vx = 0; car.vy = 0; });
+      trains.forEach((train) => { train.speed = 0; });
     });
   }
 
-  function safeFrame(now) {
-    updateRailStatus();
-    updatePhase(now);
-    updateSystemPanel();
-    updateSignals();
-    const dt = lastFrameAt ? Math.min(50, now - lastFrameAt) : 0;
-    lastFrameAt = now;
-    if (!paused && !incidentHold) {
-      updateTrain(dt);
+  function frame(timestamp) {
+    const dt = lastFrame ? Math.min(60, timestamp - lastFrame) : 0;
+    lastFrame = timestamp;
+    if (!paused) updatePedestrians(dt);
+    if (!paused && !incident) {
+      updateRailPriority();
+      applyPendingManualRoad(timestamp);
+      updateAuto(timestamp);
       moveCars(dt);
-      updateRailStatus();
-      detectCollision();
+      moveTrains(dt);
+      detectConflicts();
+      updateRailPriority();
+      refreshRailPanels();
     }
-    updateSystemPanel();
-    updateSignals();
-    updateUptime(Date.now());
+    updateStatus();
+    updateUptime();
+    refreshSignalPanels();
+    refreshPedPanels();
     draw();
-    window.requestAnimationFrame(safeFrame);
+    requestAnimationFrame(frame);
   }
 
   function reset() {
-    cars = [];
-    trains = [];
-    events = [];
-    selectedCar = 0;
-    phaseIndex = 0;
-    phaseStartedAt = performance.now();
-    allRedUntil = phaseStartedAt + ALL_RED_MS;
-    startedAt = Date.now();
-    incidentHold = false;
-    paused = false;
-    railApproachActive = false;
-    railOccupied = false;
-    previousRailPriority = false;
+    paused = false; incident = false; cars = []; trains = []; pedestrians = []; events = [];
+    roadSignals = { N: 'RED', E: 'RED', S: 'RED', O: 'RED' };
+    railSignals = { A: 'STOP', B: 'STOP' };
+    pedestrianSignals = { N: 'STOP', E: 'STOP', S: 'STOP', O: 'STOP' };
+    pedestrianRequests = { N: 0, E: 0, S: 0, O: 0 };
+    railSensors = { A: false, B: false };
+    stopSensors = { N: false, E: false, S: false, O: false };
+    selectedCar = 0; selectedTrain = 'A'; mode = $('modeSelect').value;
+    autoRoadIndex = 3; autoStage = 'ALL_RED'; autoStageAt = now(); autoPedDirection = null; autoPedUntil = 0;
+    railPriority = false; railOccupied = false; roadTransitionUntil = 0; pendingManualRoad = null; railReadyAt = { A: 0, B: 0 };
+    startedAt = Date.now(); lastFrame = 0;
     $('pauseBtn').textContent = 'Ⅱ Pausar';
-    $('systemState').textContent = 'VERMELHO INTEGRAL';
-    $('systemState').style.color = 'var(--amber)';
-    setText('status', 'Intervalo inicial de segurança antes da primeira fase.');
-    $('stateTrack').style.background = 'var(--amber)';
-    $('sensorStop').textContent = 'NORMAL';
-    $('sensorStop').style.color = 'var(--green)';
     $('rearmBtn').disabled = true;
-    appendEvent('SISTEMA INICIADO', 'Nova sessão de simulação.');
-    createCar('N');
-    createCar('O');
-    updateMetrics();
+    $('sensorA').setAttribute('aria-pressed', 'false'); $('sensorA').textContent = 'Livre'; $('sensorA').classList.remove('on');
+    $('sensorB').setAttribute('aria-pressed', 'false'); $('sensorB').textContent = 'Livre'; $('sensorB').classList.remove('on');
+    document.querySelectorAll('[data-stop-sensor]').forEach((button) => { button.setAttribute('aria-pressed', 'false'); button.textContent = 'Normal'; button.classList.remove('on'); });
+    createTrain('A'); createTrain('B'); createCar('N'); createCar('O');
+    allRoadRed();
+    if (mode === 'auto') { autoRoadIndex = 3; autoStage = 'ALL_RED'; autoStageAt = now(); }
+    refreshSignalPanels(); refreshRailPanels(); refreshPedPanels();
+    setSystemState('MANUAL · VERMELHO', 'Todas as autorizações começam em vermelho.', 'var(--muted)');
+    addEvent('SISTEMA INICIADO', 'Cruzamento reiniciado em modo manual.');
   }
 
-  attachEvents();
+  bindControls();
   reset();
-  window.requestAnimationFrame(safeFrame);
+  requestAnimationFrame(frame);
 })();
 </script>
 </body>
