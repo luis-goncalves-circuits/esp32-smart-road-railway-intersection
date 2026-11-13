@@ -1,0 +1,7 @@
+<!doctype html>
+<html lang="pt-PT"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Simulador de cruzamento inteligente</title><link rel="stylesheet" href="style.css"></head>
+<body><header><h1>Simulador de cruzamento rodoviário e ferroviário</h1><p>Protótipo visual — não representa um sistema de segurança certificado.</p></header>
+<main><section class="panel"><canvas id="scene" width="900" height="600" aria-label="Cruzamento com quatro vias rodoviárias e duas vias ferroviárias"></canvas>
+<div class="controls"><button id="addCar">Adicionar automóvel</button><button id="addTrain">Adicionar comboio</button><button id="violation">Simular passagem no vermelho</button><button id="reset">Reiniciar</button></div>
+<p id="status" role="status">Estado: normal</p></section>
+<aside><h2>Controlos</h2><ul><li>Setas: conduzir o automóvel seleccionado.</li><li>Shift + setas: conduzir o comboio.</li><li>Adicionar automóvel/comboio para criar veículos.</li><li>Passagem no vermelho: activa retenção de segurança.</li></ul><p>Simulação simplificada, sem física realista nem ligação à API.</p></aside></main><script src="app.js"></script></body></html>
