@@ -287,9 +287,9 @@ footer{border-top:1px solid var(--line);padding:14px 20px;text-align:center;colo
       return false;
     }
     if (state === 'GO') {
-      const ownTrackOccupied = railSensors[track] || trains.some((train) => train.track === track && train.x > 370 && train.x < 730);
-      if (ownTrackOccupied) {
-        addEvent('MARCHA FERROVIÁRIA RECUSADA', 'A via ' + track + ' está ocupada segundo o sensor/simulador.');
+      const trainAlreadyInSection = trains.some((train) => train.track === track && train.x > 370 && train.x < 730);
+      if (railSensors[track] && !trainAlreadyInSection) {
+        addEvent('MARCHA FERROVIÁRIA RECUSADA', 'O sensor da via ' + track + ' indica ocupação sem um comboio identificável para libertar a secção.');
         return false;
       }
       if (anyCarInConflict() || isPedWalking() || anyPedInMotion()) {
@@ -410,7 +410,8 @@ footer{border-top:1px solid var(--line);padding:14px 20px;text-align:center;colo
     if (!incident) return;
     const trainStillNear = trains.some((train) => train.x > 175 && train.x < 925);
     const sensorStillOccupied = railSensors.A || railSensors.B;
-    if (trainStillNear || sensorStillOccupied || anyCarInConflict() || anyPedInMotion()) {
+    const stopLineStillActive = DIRS.some((direction) => stopSensors[direction]);
+    if (trainStillNear || sensorStillOccupied || stopLineStillActive || anyCarInConflict() || anyPedInMotion()) {
       addEvent('REARME RECUSADO', 'Ainda existe ocupação na zona de conflito ou prioridade ferroviária.');
       setText('status', 'Não é possível rearmar: confirma que a zona está livre e que os sensores estão normalizados.');
       return;
@@ -882,8 +883,11 @@ footer{border-top:1px solid var(--line);padding:14px 20px;text-align:center;colo
     $('clearVehicles').addEventListener('click', () => {
       cars = []; pedestrians = []; trains = [];
       railSensors = { A: false, B: false };
+      railSignals = { A: 'STOP', B: 'STOP' };
+      railReadyAt = { A: 0, B: 0 };
       $('sensorA').setAttribute('aria-pressed', 'false'); $('sensorA').textContent = 'Livre'; $('sensorA').classList.remove('on');
       $('sensorB').setAttribute('aria-pressed', 'false'); $('sensorB').textContent = 'Livre'; $('sensorB').classList.remove('on');
+      allRoadRed(); allPedestrianStop();
       updateCounts(); refreshRailPanels(); addEvent('SIMULAÇÃO LIMPA', 'Veículos, comboios, peões e ocupações simuladas removidos.');
     });
     $('violation').addEventListener('click', () => triggerIncident('Infração simulada pelo operador.'));
