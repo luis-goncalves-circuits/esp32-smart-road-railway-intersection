@@ -47,6 +47,7 @@
   let railOccupied = false;
   let roadTransitionUntil = 0;
   let pendingManualRoad = null;
+  let railReadyAt = { A: 0, B: 0 };
 
   const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
   const now = () => performance.now();
@@ -151,7 +152,9 @@
       roadSignals[direction] = 'AMBER';
     } else {
       if (pendingManualRoad === direction) pendingManualRoad = null;
+      const wasAuthorised = roadSignals[direction] !== 'RED';
       roadSignals[direction] = 'RED';
+      if (wasAuthorised) roadTransitionUntil = Math.max(roadTransitionUntil, now() + ALL_RED_MS);
     }
     refreshSignalPanels();
     addEvent('SEMÁFORO RODOVIÁRIO', DIR_NAMES[direction] + ': ' + aspectName(aspect) + '.');
@@ -175,6 +178,9 @@
       }
       allRoadRed();
       allPedestrianStop();
+      railReadyAt[track] = roadTransitionUntil;
+    } else {
+      railReadyAt[track] = 0;
     }
     railSignals[track] = state;
     for (const train of trains.filter((t) => t.track === track)) {
@@ -202,7 +208,7 @@
       addEvent('COMANDO PEDONAL IGNORADO', 'No modo automático, o ciclo gere os pedidos.');
       return false;
     }
-    if (incident || railIsBlockedForRoad() || DIRS.some((d) => roadSignals[d] !== 'RED') || anyCarInConflict() || hasMovingTrain()) {
+    if (incident || railIsBlockedForRoad() || DIRS.some((d) => roadSignals[d] !== 'RED') || now() < roadTransitionUntil || anyCarInConflict() || hasMovingTrain()) {
       addEvent('PASSADEIRA BLOQUEADA', 'Não é seguro autorizar peões: existe prioridade ferroviária, incidente ou veículo na zona.');
       return false;
     }
@@ -527,7 +533,7 @@
     const seconds = dt / 1000;
     for (const train of trains) {
       if (Math.abs(train.speed) < 0.01) continue;
-      if (railSignals[train.track] !== 'GO') {
+      if (railSignals[train.track] !== 'GO' || now() < railReadyAt[train.track]) {
         train.speed = 0;
         addEvent('COMBOIO RETIDO', 'A via ' + train.track + ' tem o sinal em PARAR.');
         continue;
@@ -802,6 +808,7 @@
         const train = trains.find((t) => t.track === selectedTrain);
         if (!train) { addEvent('SEM COMBOIO', 'Insere primeiro um comboio na via seleccionada.'); return; }
         if (railSignals[train.track] !== 'GO') { train.speed = 0; addEvent('COMBOIO RETIDO', 'Autoriza primeiro o sinal ferroviário da via ' + train.track + '.'); return; }
+        if (now() < railReadyAt[train.track]) { train.speed = 0; addEvent('INTERVALO DE SEGURANÇA', 'Aguarda o fim do vermelho integral antes da marcha.'); return; }
         if (event.key === 'ArrowRight') train.speed = 125;
         if (event.key === 'ArrowLeft') train.speed = -125;
         return;
@@ -862,7 +869,7 @@
     stopSensors = { N: false, E: false, S: false, O: false };
     selectedCar = 0; selectedTrain = 'A'; mode = $('modeSelect').value;
     autoRoadIndex = 0; autoStage = 'GREEN'; autoStageAt = now(); autoPedDirection = null; autoPedUntil = 0;
-    railPriority = false; railOccupied = false; previousRailPriority = false; roadTransitionUntil = 0; pendingManualRoad = null;
+    railPriority = false; railOccupied = false; previousRailPriority = false; roadTransitionUntil = 0; pendingManualRoad = null; railReadyAt = { A: 0, B: 0 };
     startedAt = Date.now(); lastFrame = 0;
     $('pauseBtn').textContent = 'Ⅱ Pausar';
     $('rearmBtn').disabled = true;
@@ -870,7 +877,9 @@
     $('sensorB').setAttribute('aria-pressed', 'false'); $('sensorB').textContent = 'Livre'; $('sensorB').classList.remove('on');
     document.querySelectorAll('[data-stop-sensor]').forEach((button) => { button.setAttribute('aria-pressed', 'false'); button.textContent = 'Normal'; button.classList.remove('on'); });
     createTrain('A'); createTrain('B'); createCar('N'); createCar('O');
-    allRoadRed(); refreshSignalPanels(); refreshRailPanels(); refreshPedPanels();
+    allRoadRed();
+    if (mode === 'auto') { autoStage = 'ALL_RED'; autoStageAt = now(); }
+    refreshSignalPanels(); refreshRailPanels(); refreshPedPanels();
     setSystemState('MANUAL · VERMELHO', 'Todas as autorizações começam em vermelho.', 'var(--muted)');
     addEvent('SISTEMA INICIADO', 'Cruzamento reiniciado em modo manual.');
   }
