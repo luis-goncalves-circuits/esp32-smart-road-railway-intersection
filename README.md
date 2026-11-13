@@ -1,28 +1,24 @@
 # ESP32 Smart Road–Railway Intersection
 
-Protótipo académico de controlo de um cruzamento rodoviário de quatro aproximações com atravessamento ferroviário de duas vias.
+Protótipo académico de cruzamento inteligente com quatro aproximações rodoviárias e duas vias ferroviárias. O objectivo é estudar a coordenação de tráfego, a detecção de eventos e a interacção entre firmware, API e simulador.
 
-## O que inclui
-- Firmware ESP32 (PlatformIO/Arduino) com máquina de estados restritiva, quatro fases rodoviárias, duas entradas de ocupação ferroviária e entradas para sensores de linha de paragem.
-- API FastAPI para registo de eventos e encaminhamento opcional para um webhook externo.
-- Simulador web local: condução de automóveis e comboio com as setas do teclado.
-- Documentação de arquitectura, hardware, segurança e fluxogramas.
+## Módulos
+- **Firmware:** ESP32 com PlatformIO/Arduino e máquina de estados inicial.
+- **Simulador:** interface gráfica 2D com vista superior, automóveis, comboios, estados de sinalização, indicadores, registo de eventos e controlos por teclado.
+- **Backend:** API FastAPI com persistência SQLite e encaminhamento opcional por webhook.
+- **Documentação:** arquitectura, hardware, segurança, fluxogramas e plano de desenvolvimento.
 
-## Estrutura
-```
-firmware/       Firmware ESP32
-backend/        API e testes
-simulator/      Simulador HTML/CSS/JavaScript
-docs/           Arquitectura, hardware, segurança e fluxogramas
-platformio.ini
-docker-compose.yml
-```
+## Executar o simulador
+Abrir `simulator/index.html` num navegador moderno. Não requer instalação.
+- Setas: orientar e conduzir o automóvel seleccionado.
+- `Shift` + setas: controlar o comboio.
+- `Tab`: seleccionar outro automóvel.
+- `Espaço`: pausar/retomar.
+- Os botões permitem adicionar veículos, simular uma infracção e reiniciar.
 
-## Arranque rápido
-### Simulador
-Abra `simulator/index.html` num navegador moderno. Use as setas para conduzir o automóvel seleccionado; use Shift + setas para controlar o comboio. Os controlos também estão descritos na página.
+Os SVG em `simulator/assets` são ilustrações locais usadas pela interface.
 
-### Backend
+## Executar o backend
 ```bash
 cd backend
 python -m venv .venv
@@ -31,24 +27,21 @@ python -m venv .venv
 pip install -r requirements.txt
 uvicorn app:app --reload
 ```
-API em `http://127.0.0.1:8000`; documentação interactiva em `/docs`.
+API: `http://127.0.0.1:8000`; documentação: `/docs`. Para execução com Docker: `docker compose up --build`.
 
-### Firmware
-Instale o PlatformIO, ligue uma placa ESP32 compatível e execute:
+## Compilar o firmware
+Instalar PlatformIO e executar:
 ```bash
 pio run
 pio run -t upload
 pio device monitor
 ```
-Confirme e adapte os GPIOs em `firmware/src/main.cpp` ao hardware real antes de ligar sensores.
+Verificar e adaptar o mapa de GPIO ao modelo exacto da placa antes de ligar qualquer componente.
 
-## Limitações importantes
-Este repositório é um protótipo de ensino e simulação. Não é um sistema de sinalização rodoviária ou ferroviária certificado. **Não o ligue a semáforos reais, agulhas, barreiras, circuitos de via, interlocking ou material circulante.** A lógica apresentada não substitui uma análise de perigos, redundância, diagnóstico, SIL, validação independente ou aprovação do operador ferroviário e das autoridades.
+## Estado do projecto
+A branch principal `main` contém a estrutura e a primeira versão dos módulos. O simulador recebeu uma interface gráfica ampliada e elementos SVG. Ainda faltam funcionalidades importantes: simulação física e gestão de conflitos, máquina de estados de firmware completa, integração de sensores/câmaras, ANPR, ligação do simulador à API, autenticação robusta, armazenamento de evidência e testes automatizados/CI. O estado detalhado está em [docs/PROJECT_PLAN.md](docs/PROJECT_PLAN.md).
 
-A integração ANPR/câmaras não está implementada: a API apenas permite receber texto de matrícula e uma referência de evidência fornecidos por um sistema externo. Não existe reconhecimento facial nem identificação automática do condutor. A integração com um fornecedor de nuvem é opcional e depende da configuração de webhook. O simulador funciona autonomamente e ainda não comunica com a API.
+## Limite de segurança
+**Não utilizar para controlar estradas, passagens de nível, sinalização ferroviária, barreiras, interlocking ou comboios reais.** Não é um sistema certificado, redundante ou validado para segurança funcional. Uma travagem de comboio não é instantânea. Qualquer aplicação operacional exigiria engenharia de segurança, análise formal de perigos, interfaces certificadas, validação independente e aprovação do operador e das autoridades.
 
-## Segurança e privacidade
-Ver `docs/SAFETY.md` antes de qualquer ensaio. Matrículas e imagens podem constituir dados pessoais; qualquer recolha real exige fundamento jurídico, informação aos titulares, minimização, controlo de acesso, retenção limitada e avaliação RGPD adequada.
-
-## Estado de validação
-O conteúdo foi colocado na branch `main`. A compilação PlatformIO, os testes automatizados, os ensaios em hardware e a integração de serviços externos têm de ser executados e confirmados separadamente; não são declarados como concluídos.
+Matrículas e imagens podem ser dados pessoais. Não existe reconhecimento facial nem identificação automática do condutor. Qualquer implementação de ANPR exige fundamento jurídico, transparência, minimização, retenção limitada, segurança e revisão humana.
