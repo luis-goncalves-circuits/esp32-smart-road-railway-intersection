@@ -78,7 +78,7 @@ def main():
         "sensorB",
         "sendLora",
     }
-    missing_required_ids = sorted(required_ids - set(re.findall(r'\\bid="([^"]+)"', modular)))
+    missing_required_ids = sorted(required_ids - set(re.findall(r'\bid="([^"]+)"', modular)))
     if missing_required_ids:
         raise SystemExit(f"Controlos essenciais em falta: {missing_required_ids}")
     if javascript not in standalone or stylesheet not in standalone:
