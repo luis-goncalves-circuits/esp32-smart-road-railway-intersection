@@ -1,16 +1,19 @@
 # Arquitectura
 
-O projecto é dividido em três blocos que, nesta versão, ainda funcionam de forma independente: controlador ESP32, API de registo e simulador de navegador.
+O projecto divide-se em controlador ESP32, API de eventos, simulador de navegador e uma ligação rádio LoRa experimental.
 
 ## Controlador ESP32
-O firmware implementa uma máquina de estados didáctica: `ALL_RED`, `ROAD_GREEN`, `RAIL_OCCUPIED`, `INCIDENT_HOLD` e `SENSOR_FAULT`. As quatro aproximações recebem autorização verde de forma sequencial, com um intervalo de vermelho integral entre fases. A activação de qualquer sensor ferroviário retira as autorizações rodoviárias. Uma activação de sensor de linha durante uma fase não autorizada gera um evento candidato e coloca o protótipo em retenção. As entradas digitais são activas a LOW e têm debounce por software.
-
-As saídas são apenas LEDs de bancada que representam autorização verde. Não existem lâmpadas vermelhas/amarelas, interlocking, watchdog de hardware ou diagnóstico eléctrico certificado.
-
-## Backend
-FastAPI recebe e valida eventos, guarda-os em SQLite e pode encaminhá-los para um webhook configurado. Cada pedido abre e fecha a sua ligação à base de dados. A chave API é opcional, definida por variável de ambiente. O endpoint de saúde não exige autenticação.
+O firmware principal implementa uma máquina de estados didáctica com quatro fases rodoviárias e intervalos de vermelho integral, retenção por ocupação ferroviária, debounce e rearme físico. As saídas existentes são LEDs de demonstração que representam autorização verde; não são saídas completas de semáforos reais.
 
 ## Simulador
-O simulador desenha a intersecção em Canvas, controla automóveis e comboios através das setas, apresenta as fases, indicadores e histórico de eventos. Detecta cruzamento da linha de paragem com sinal não autorizado e conflitos geométricos simplificados. O estado `INCIDENT_HOLD` bloqueia a movimentação e exige rearme manual após a zona ficar livre.
+O simulador Canvas representa quatro aproximações rodoviárias, duas vias ferroviárias e quatro passadeiras. Os utilizadores podem controlar cada semáforo rodoviário, sinal ferroviário e sinal pedonal no modo manual, ou activar um ciclo automático demonstrativo. Inclui automóveis, dois comboios seleccionáveis, peões, pedidos de atravessamento, sensores simulados, registo de eventos e retenções por conflito.
 
-O simulador não está ligado ao backend nem ao firmware. A sua física e lógica são demonstrativas e não constituem validação de segurança.
+A versão modular utiliza HTML/CSS/JavaScript separados. A versão standalone incorpora CSS e JavaScript num só ficheiro para execução local sem dependências adjacentes. A lógica é geométrica e didáctica; não substitui simulação ferroviária/rodoviária validada.
+
+## Backend
+FastAPI recebe e valida eventos, guarda-os em SQLite e pode encaminhá-los para um webhook configurado. A chave API é opcional por variável de ambiente. O simulador ainda não envia eventos para a API.
+
+## LoRa
+O painel do browser gera apenas pacotes demonstrativos. Dois projectos PlatformIO independentes implementam um transmissor ESP32/SX127x e um gateway receptor ESP32/SX127x. O emissor envia um heartbeat JSON; o gateway imprime o conteúdo, RSSI e SNR. Ainda não existe integração com os sensores do controlador principal ou encaminhamento do gateway para a API.
+
+LoRa é usado apenas como telemetria experimental. O CRC não autentica nem cifra os pacotes. Não pode transportar permissões safety-critical, substituir interlocking, nem servir como canal único de emergência.
