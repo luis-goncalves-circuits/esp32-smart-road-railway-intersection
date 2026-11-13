@@ -1,105 +1,104 @@
 <!doctype html>
 <html lang="pt-PT">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#0b1420">
-  <meta name="description" content="Simulador didáctico de um cruzamento rodoviário e ferroviário com controlador ESP32 conceptual.">
-  <title>Smart Junction | Simulador</title>
-  <link rel="stylesheet" href="style.css">
-  <script src="app.js" defer></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0b1420">
+<meta name="description" content="Simulador didáctico de cruzamento rodoviário e ferroviário, semáforos, peões e telemetria LoRa.">
+<title>Smart Junction | Simulador de tráfego</title>
+<link rel="stylesheet" href="style.css">
+<script src="app.js" defer></script>
 </head>
 <body>
-  <header class="topbar">
-    <div class="brand">
-      <span class="brand-mark" aria-hidden="true">SJ</span>
-      <div><strong>SMART JUNCTION</strong><small>ROAD + RAIL CONTROL LAB</small></div>
+<header class="topbar">
+  <div class="brand"><span class="brand-mark">SJ</span><div><strong>SMART JUNCTION</strong><small>ROAD · RAIL · PEDESTRIAN · LoRa LAB</small></div></div>
+  <div class="top-status"><span class="live-dot"></span> SIMULAÇÃO LOCAL <span class="pill">v0.4</span></div>
+</header>
+<main class="layout">
+<section class="workspace" aria-labelledby="pageTitle">
+  <div class="section-heading">
+    <div><p class="eyebrow">CENTRO DE CONTROLO</p><h1 id="pageTitle">Cruzamento inteligente</h1><p class="muted">4 aproximações rodoviárias · 2 vias ferroviárias · 4 passadeiras · ESP32 + LoRa conceptual</p></div>
+    <div class="run-controls">
+      <label class="mode-label" for="modeSelect">Modo</label>
+      <select id="modeSelect" class="select"><option value="manual" selected>Manual</option><option value="auto">Automático</option></select>
+      <button id="pauseBtn" class="button secondary" type="button">Ⅱ Pausar</button>
+      <button id="reset" class="button secondary" type="button">↻ Reiniciar</button>
     </div>
-    <div class="top-status"><span class="live-dot" aria-hidden="true"></span> SIMULAÇÃO LOCAL <span class="pill">v0.3</span></div>
-  </header>
+  </div>
+  <div class="scene-wrap">
+    <div class="scene-label">VISTA SUPERIOR · SIMULAÇÃO 2D</div>
+    <canvas id="scene" width="1100" height="760" aria-label="Cruzamento com quatro estradas, duas vias ferroviárias paralelas, semáforos e passadeiras para peões"></canvas>
+    <div class="scene-legend"><span><i class="dot road"></i> Estrada</span><span><i class="dot rail"></i> Ferrovia</span><span><i class="dot ped"></i> Passadeira</span><span><i class="dot safe"></i> Verde</span><span><i class="dot danger"></i> Bloqueio</span></div>
+  </div>
+  <div class="toolbar">
+    <button id="addCar" class="button primary" type="button">＋ Automóvel</button>
+    <button id="addTrainA" class="button primary" type="button">＋ Comboio via A</button>
+    <button id="addTrainB" class="button primary" type="button">＋ Comboio via B</button>
+    <button id="addPed" class="button primary" type="button">＋ Peão</button>
+    <button id="violation" class="button danger" type="button">⚠ Simular infracção</button>
+    <button id="rearmBtn" class="button secondary" type="button" disabled>Rearmar</button>
+  </div>
+  <div class="keyboard-help"><b>Controlos:</b> setas para conduzir o automóvel seleccionado · <kbd>Shift</kbd> + ←/→ para mover o comboio seleccionado · <kbd>Tab</kbd> muda o automóvel · <kbd>Espaço</kbd> pausa/retoma. Selecciona o comboio no painel ferroviário.</div>
 
-  <main class="layout">
-    <section class="workspace" aria-labelledby="pageTitle">
-      <div class="section-heading">
-        <div>
-          <p class="eyebrow">CENTRO DE CONTROLO</p>
-          <h1 id="pageTitle">Cruzamento inteligente</h1>
-          <p class="muted">Quatro aproximações rodoviárias · duas vias ferroviárias · controlo ESP32 conceptual</p>
-        </div>
-        <div class="run-controls">
-          <button id="pauseBtn" class="button secondary" type="button">Ⅱ Pausar</button>
-          <button id="reset" class="button secondary" type="button">↻ Reiniciar</button>
-        </div>
-      </div>
+  <section class="card control-card">
+    <div class="card-title"><span>SEMÁFOROS RODOVIÁRIOS · COMANDO MANUAL</span><span class="muted">N / E / S / O</span></div>
+    <p class="hint">No modo manual, escolhe vermelho, amarelo ou verde para cada aproximação. O interbloqueio bloqueia verdes incompatíveis e qualquer autorização rodoviária perante prioridade ferroviária ou passagem pedonal activa.</p>
+    <div class="signal-control-grid">
+      <div class="signal-control"><b>NORTE</b><span id="roadNState" class="aspect-badge red">VERMELHO</span><div><button data-road="N" data-aspect="RED" class="aspect red">Vermelho</button><button data-road="N" data-aspect="AMBER" class="aspect amber">Amarelo</button><button data-road="N" data-aspect="GREEN" class="aspect green">Verde</button></div></div>
+      <div class="signal-control"><b>ESTE</b><span id="roadEState" class="aspect-badge red">VERMELHO</span><div><button data-road="E" data-aspect="RED" class="aspect red">Vermelho</button><button data-road="E" data-aspect="AMBER" class="aspect amber">Amarelo</button><button data-road="E" data-aspect="GREEN" class="aspect green">Verde</button></div></div>
+      <div class="signal-control"><b>SUL</b><span id="roadSState" class="aspect-badge red">VERMELHO</span><div><button data-road="S" data-aspect="RED" class="aspect red">Vermelho</button><button data-road="S" data-aspect="AMBER" class="aspect amber">Amarelo</button><button data-road="S" data-aspect="GREEN" class="aspect green">Verde</button></div></div>
+      <div class="signal-control"><b>OESTE</b><span id="roadOState" class="aspect-badge red">VERMELHO</span><div><button data-road="O" data-aspect="RED" class="aspect red">Vermelho</button><button data-road="O" data-aspect="AMBER" class="aspect amber">Amarelo</button><button data-road="O" data-aspect="GREEN" class="aspect green">Verde</button></div></div>
+    </div>
+  </section>
 
-      <div class="scene-wrap">
-        <div class="scene-label">VISTA SUPERIOR · SIMULAÇÃO 2D</div>
-        <canvas id="scene" width="1000" height="680" aria-label="Vista superior de um cruzamento rodoviário de quatro sentidos atravessado por duas vias ferroviárias"></canvas>
-        <div class="scene-legend" aria-label="Legenda">
-          <span><i class="dot road"></i> Estrada</span>
-          <span><i class="dot rail"></i> Ferrovia</span>
-          <span><i class="dot safe"></i> Zona livre</span>
-          <span><i class="dot danger"></i> Incidente</span>
-        </div>
-      </div>
+  <section class="control-grid">
+    <div class="card control-card">
+      <div class="card-title"><span>SINAIS FERROVIÁRIOS</span><span class="muted">VIAS A / B</span></div>
+      <p class="hint">Autoriza a marcha do comboio seleccionado. A autorização é recusada se houver veículos ou peões na zona de conflito.</p>
+      <div class="rail-control-row"><b>Via A</b><span id="railAState" class="aspect-badge red">PARAR</span><button data-rail="A" data-state="STOP" class="button mini secondary">Parar</button><button data-rail="A" data-state="GO" class="button mini rail-go">Autorizar</button></div>
+      <div class="rail-control-row"><b>Via B</b><span id="railBState" class="aspect-badge red">PARAR</span><button data-rail="B" data-state="STOP" class="button mini secondary">Parar</button><button data-rail="B" data-state="GO" class="button mini rail-go">Autorizar</button></div>
+      <div class="train-tools"><label for="trainSelect">Comboio seleccionado</label><select id="trainSelect" class="select"><option value="A">Via A</option><option value="B">Via B</option></select><button id="trainStop" class="button mini danger" type="button">Parar comboio</button></div>
+    </div>
+    <div class="card control-card">
+      <div class="card-title"><span>PASSADEIRAS E PEÕES</span><span class="muted">4 TRAVESSIAS</span></div>
+      <p class="hint">Os pedidos de atravessamento ficam em fila. No modo manual, coloca os veículos em vermelho e depois autoriza a travessia pedonal.</p>
+      <div class="ped-control-row"><b>Norte</b><span id="pedNState" class="aspect-badge red">NÃO ATRAVESSAR</span><button data-ped-request="N" class="button mini secondary">Pedir</button><button data-ped-state="N" data-state="WALK" class="button mini ped-go">Autorizar</button><button data-ped-state="N" data-state="STOP" class="button mini danger">Parar</button></div>
+      <div class="ped-control-row"><b>Este</b><span id="pedEState" class="aspect-badge red">NÃO ATRAVESSAR</span><button data-ped-request="E" class="button mini secondary">Pedir</button><button data-ped-state="E" data-state="WALK" class="button mini ped-go">Autorizar</button><button data-ped-state="E" data-state="STOP" class="button mini danger">Parar</button></div>
+      <div class="ped-control-row"><b>Sul</b><span id="pedSState" class="aspect-badge red">NÃO ATRAVESSAR</span><button data-ped-request="S" class="button mini secondary">Pedir</button><button data-ped-state="S" data-state="WALK" class="button mini ped-go">Autorizar</button><button data-ped-state="S" data-state="STOP" class="button mini danger">Parar</button></div>
+      <div class="ped-control-row"><b>Oeste</b><span id="pedOState" class="aspect-badge red">NÃO ATRAVESSAR</span><button data-ped-request="O" class="button mini secondary">Pedir</button><button data-ped-state="O" data-state="WALK" class="button mini ped-go">Autorizar</button><button data-ped-state="O" data-state="STOP" class="button mini danger">Parar</button></div>
+      <div class="ped-footer"><span id="pedCount">0</span> peões na simulação · <span id="pedRequests">0</span> pedidos pendentes</div>
+    </div>
+  </section>
 
-      <div class="toolbar">
-        <button id="addCar" class="button primary" type="button">＋ Automóvel</button>
-        <button id="addTrain" class="button primary" type="button">＋ Comboio</button>
-        <button id="violation" class="button danger" type="button">⚠ Simular infracção</button>
-        <button id="clearVehicles" class="button secondary" type="button">Limpar veículos</button>
-        <button id="rearmBtn" class="button secondary" type="button" disabled>Rearmar após verificação</button>
-      </div>
+  <section class="control-grid">
+    <div class="card control-card">
+      <div class="card-title"><span>SENSORES SIMULADOS</span><span class="muted">ENTRADAS</span></div>
+      <div class="sensor-control"><b>Ocupação via A</b><button id="sensorA" class="toggle" type="button" aria-pressed="false">Livre</button></div>
+      <div class="sensor-control"><b>Ocupação via B</b><button id="sensorB" class="toggle" type="button" aria-pressed="false">Livre</button></div>
+      <div class="sensor-control"><b>Linha de paragem N</b><button data-stop-sensor="N" class="toggle" type="button" aria-pressed="false">Normal</button></div>
+      <div class="sensor-control"><b>Linha de paragem E</b><button data-stop-sensor="E" class="toggle" type="button" aria-pressed="false">Normal</button></div>
+      <div class="sensor-control"><b>Linha de paragem S</b><button data-stop-sensor="S" class="toggle" type="button" aria-pressed="false">Normal</button></div>
+      <div class="sensor-control"><b>Linha de paragem O</b><button data-stop-sensor="O" class="toggle" type="button" aria-pressed="false">Normal</button></div>
+    </div>
+    <div class="card control-card">
+      <div class="card-title"><span>LoRa · TELEMETRIA</span><span class="pill amber-text">RÁDIO SIMULADO</span></div>
+      <p class="hint">Simula pacotes de estado do ESP32 para uma estação remota. Não existe transmissão RF neste modo de navegador.</p>
+      <div class="lora-stats"><div><small>Gateway</small><b id="loraLink">Desligado</b></div><div><small>RSSI simulado</small><b id="loraRssi">— dBm</b></div><div><small>SNR simulado</small><b id="loraSnr">— dB</b></div><div><small>Pacotes TX</small><b id="loraPackets">0</b></div></div>
+      <button id="sendLora" class="button primary" type="button">⇧ Enviar telemetria LoRa</button>
+      <pre id="loraPayload" class="payload">À espera do primeiro pacote…</pre>
+    </div>
+  </section>
+</section>
 
-      <div class="keyboard-help"><b>Controlos:</b> setas para conduzir o automóvel seleccionado · <kbd>Shift</kbd> + ←/→ para conduzir o comboio · <kbd>Tab</kbd> muda o automóvel seleccionado · <kbd>Espaço</kbd> pausa/retoma</div>
-    </section>
-
-    <aside class="sidebar" aria-label="Painel de controlo">
-      <section class="card status-card">
-        <div class="card-title"><span>ESTADO DO SISTEMA</span><span class="live-dot" aria-hidden="true"></span></div>
-        <div id="systemState" class="state-value">OPERAÇÃO NORMAL</div>
-        <p id="status" class="muted" role="status">Sistema em funcionamento normal.</p>
-        <div class="state-track"><span id="stateTrack"></span></div>
-      </section>
-
-      <section class="card">
-        <div class="card-title">FASES DE SINALIZAÇÃO <span class="muted">CICLO DEMO</span></div>
-        <div class="signal-grid">
-          <div class="signal" id="sigN"><b>N</b><i></i><span>Norte</span></div>
-          <div class="signal" id="sigE"><b>E</b><i></i><span>Este</span></div>
-          <div class="signal" id="sigS"><b>S</b><i></i><span>Sul</span></div>
-          <div class="signal" id="sigW"><b>O</b><i></i><span>Oeste</span></div>
-        </div>
-        <div class="rail-state"><span class="rail-icon" aria-hidden="true">▰</span><div><b>Prioridade ferroviária</b><small id="railState">Via livre · sem comboio na zona</small></div><span id="railLamp" class="lamp green"></span></div>
-      </section>
-
-      <section class="card metrics">
-        <div class="card-title">INDICADORES</div>
-        <div class="metric-grid">
-          <div><strong id="carCount">0</strong><small>Automóveis</small></div>
-          <div><strong id="trainCount">0</strong><small>Comboios</small></div>
-          <div><strong id="eventCount">0</strong><small>Ocorrências</small></div>
-          <div><strong id="uptime">00:00</strong><small>Tempo de sessão</small></div>
-        </div>
-      </section>
-
-      <section class="card">
-        <div class="card-title">SENSORES E EQUIPAMENTO</div>
-        <div class="device"><img src="assets/esp32.svg" alt="Ilustração de uma placa ESP32"><div><b>Controlador ESP32</b><small>Unidade lógica · protótipo</small></div><span class="lamp green"></span></div>
-        <div class="device"><img src="assets/camera.svg" alt="Ilustração de uma câmara"><div><b>Câmara / ANPR</b><small id="cameraState">Integração por implementar</small></div><span class="lamp amber"></span></div>
-        <div class="sensor-row"><span>Detecção de ocupação ferroviária A/B</span><b id="sensorRail">LIVRE</b></div>
-        <div class="sensor-row"><span>Sensores de linha de paragem</span><b id="sensorStop">NORMAL</b></div>
-      </section>
-
-      <section class="card event-card">
-        <div class="card-title">REGISTO DE EVENTOS <button id="clearLog" class="text-button" type="button">Limpar</button></div>
-        <ol id="eventLog" aria-live="polite"><li class="empty">Sem ocorrências nesta sessão.</li></ol>
-      </section>
-
-      <section class="disclaimer">AMBIENTE DE ENSAIO ACADÉMICO. Não controla infra-estrutura real nem substitui sinalização certificada.</section>
-    </aside>
-  </main>
-
-  <footer>ESP32 SMART ROAD–RAILWAY INTERSECTION <span>·</span> Simulador demonstrativo, sem ligação física ao controlador.</footer>
+<aside class="sidebar" aria-label="Painel de estado">
+  <section class="card status-card"><div class="card-title"><span>ESTADO DO SISTEMA</span><span class="live-dot"></span></div><div id="systemState" class="state-value">MANUAL · VERMELHO</div><p id="status" class="muted" role="status">Todas as autorizações começam em vermelho.</p><div class="state-track"><span id="stateTrack"></span></div></section>
+  <section class="card"><div class="card-title">INDICADORES</div><div class="metric-grid"><div><strong id="carCount">0</strong><small>Automóveis</small></div><div><strong id="trainCount">0</strong><small>Comboios</small></div><div><strong id="eventCount">0</strong><small>Ocorrências</small></div><div><strong id="uptime">00:00</strong><small>Tempo de sessão</small></div></div></section>
+  <section class="card"><div class="card-title">ESTADO FERROVIÁRIO</div><div class="sensor-row"><span>Via A</span><b id="railAStatus">LIVRE</b></div><div class="sensor-row"><span>Via B</span><b id="railBStatus">LIVRE</b></div><div class="sensor-row"><span>Zona de conflito</span><b id="conflictStatus">LIVRE</b></div></section>
+  <section class="card"><div class="card-title">CÂMARAS / ANPR</div><div class="device"><span class="camera-icon">◉</span><div><b>Leitura de matrículas</b><small>Integração de vídeo por implementar</small></div><span class="lamp amber"></span></div><p class="hint">Não existe captura real, OCR ou identificação do condutor nesta versão.</p></section>
+  <section class="card event-card"><div class="card-title">REGISTO DE EVENTOS <button id="clearLog" class="text-button" type="button">Limpar</button></div><ol id="eventLog" aria-live="polite"><li class="empty">Sem ocorrências nesta sessão.</li></ol></section>
+  <div class="disclaimer">SIMULADOR ACADÉMICO. Os comandos representam um modelo didáctico e não controlam qualquer sinalização, comboio ou equipamento real. Não usar em infra-estrutura operacional.</div>
+</aside>
+</main>
+<footer>ESP32 SMART ROAD–RAILWAY INTERSECTION <span>·</span> Simulação local · LoRa RF não ligado.</footer>
 </body>
 </html>
