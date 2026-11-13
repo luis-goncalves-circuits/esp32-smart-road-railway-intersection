@@ -37,6 +37,7 @@
     <button id="addPed" class="button primary" type="button">＋ Peão</button>
     <button id="clearVehicles" class="button secondary" type="button">Limpar veículos da simulação</button>
     <button id="violation" class="button danger" type="button">⚠ Simular infracção</button>
+    <button id="emergencyStop" class="button danger" type="button">■ Paragem de emergência</button>
     <button id="rearmBtn" class="button secondary" type="button" disabled>Rearmar</button>
   </div>
   <div class="keyboard-help"><b>Controlos:</b> setas para conduzir o automóvel seleccionado · <kbd>Shift</kbd> + ←/→ para mover o comboio seleccionado · <kbd>Tab</kbd> muda o automóvel · <kbd>Espaço</kbd> pausa/retoma. Selecciona o comboio no painel ferroviário.</div>
@@ -96,7 +97,7 @@
   <section class="card"><div class="card-title">INDICADORES</div><div class="metric-grid"><div><strong id="carCount">0</strong><small>Automóveis</small></div><div><strong id="trainCount">0</strong><small>Comboios</small></div><div><strong id="eventCount">0</strong><small>Ocorrências</small></div><div><strong id="uptime">00:00</strong><small>Tempo de sessão</small></div></div></section>
   <section class="card"><div class="card-title">ESTADO FERROVIÁRIO</div><div class="sensor-row"><span>Via A</span><b id="railAStatus">LIVRE</b></div><div class="sensor-row"><span>Via B</span><b id="railBStatus">LIVRE</b></div><div class="sensor-row"><span>Zona de conflito</span><b id="conflictStatus">LIVRE</b></div></section>
   <section class="card"><div class="card-title">CÂMARAS / ANPR</div><div class="device"><span class="camera-icon">◉</span><div><b>Leitura de matrículas</b><small>Integração de vídeo por implementar</small></div><span class="lamp amber"></span></div><p class="hint">Não existe captura real, OCR ou identificação do condutor nesta versão.</p></section>
-  <section class="card event-card"><div class="card-title">REGISTO DE EVENTOS <button id="clearLog" class="text-button" type="button">Limpar</button></div><ol id="eventLog" aria-live="polite"><li class="empty">Sem ocorrências nesta sessão.</li></ol></section>
+  <section class="card event-card"><div class="card-title">REGISTO DE EVENTOS <span><button id="exportLog" class="text-button" type="button">Exportar CSV</button> <button id="clearLog" class="text-button" type="button">Limpar</button></span></div><ol id="eventLog" aria-live="polite"><li class="empty">Sem ocorrências nesta sessão.</li></ol></section>
   <div class="disclaimer">SIMULADOR ACADÉMICO. Os comandos representam um modelo didáctico e não controlam qualquer sinalização, comboio ou equipamento real. Não usar em infra-estrutura operacional.</div>
 </aside>
 </main>
