@@ -1,53 +1,64 @@
 # Plano de desenvolvimento e estado real
 
-Este documento separa funcionalidades existentes de trabalho ainda por validar. Uma interface visível não significa que exista integração física ou validação operacional.
+Este documento distingue funcionalidades presentes de integrações e testes ainda pendentes.
 
 ## 1. Simulador gráfico
-- [x] Vista superior com quatro aproximações rodoviárias e duas vias ferroviárias desenhadas.
-- [x] Painel de estado, fases indicativas, indicadores e registo de eventos.
-- [x] Inserção de automóveis e comboios e controlo por teclado.
-- [x] Pausa, reinício, simulação manual de incidente e rearme condicionado.
-- [x] Detecção geométrica simplificada de cruzamento de linha de paragem e conflito com comboio.
-- [x] Verificações de sintaxe JavaScript, IDs HTML e recursos locais.
-- [ ] Trajectórias realistas, filas, aceleração/travagem calibradas e regras de circulação completas.
-- [ ] Editor de cenários, sensores configuráveis, replay e modo de demonstração guiada.
-- [ ] Ensaios automatizados de interacção em navegador real.
+- [x] Vista superior com quatro aproximações rodoviárias, duas vias ferroviárias e quatro passadeiras.
+- [x] Comboios desenhados nas vias A/B, com selecção, autorização ferroviária e movimento manual por teclado.
+- [x] Controlo manual dos quatro semáforos rodoviários (vermelho/amarelo/verde).
+- [x] Controlo manual dos dois sinais ferroviários (parar/marcha).
+- [x] Controlo dos quatro sinais pedonais, pedidos de atravessamento e peões animados.
+- [x] Modo automático demonstrativo para fases rodoviárias.
+- [x] Simulação de sensores de ocupação ferroviária e linhas de paragem.
+- [x] Registo de eventos, contadores, pausa, reinício, retenção e rearme.
+- [x] Painel de telemetria LoRa simulada, com payload JSON, sequência, RSSI e SNR demonstrativos.
+- [x] HTML autónomo (CSS e JavaScript incorporados) para abrir com duplo clique.
+- [ ] Física calibrada, trajectórias de viragem, filas, interacção entre veículos e cenários editáveis.
+- [ ] Colisões e conflitos verificados por testes de browser e cenários de referência.
+- [ ] Testes automatizados de interacção em navegador real.
 
 ## 2. Controlador ESP32
 - [x] Estrutura PlatformIO/Arduino.
-- [x] Primeira máquina de estados com quatro fases rodoviárias e intervalo de vermelho integral.
+- [x] Máquina de estados inicial com quatro fases e intervalo de vermelho integral.
 - [x] Retenção rodoviária por ocupação ferroviária.
-- [x] Debounce por software e rearme físico supervisionado por botão.
-- [ ] Compilação PlatformIO e ensaio numa placa ESP32 real.
-- [ ] Diagnóstico eléctrico de circuito aberto/curto e sensores redundantes.
-- [ ] Watchdog de hardware/RTOS e recuperação validada após reset ou perda de alimentação.
-- [ ] Comunicação autenticada com backend e testes de integração.
+- [x] Debounce por software e rearme físico supervisionado.
+- [ ] Compilação PlatformIO e ensaio numa placa real.
+- [ ] Diagnóstico eléctrico de circuito aberto/curto, sensores redundantes e watchdog de hardware.
+- [ ] Saídas físicas completas para vermelho/amarelo/verde rodoviário, sinais ferroviários e sinais pedonais.
+- [ ] Comunicação autenticada e integração com backend.
 
-## 3. Sensores, câmaras e evidência
-- [x] Campos de evento para texto de matrícula e referência de evidência fornecidos externamente.
-- [ ] Drivers e calibração dos sensores físicos escolhidos.
-- [ ] Integração de câmaras IP/RTSP e captura controlada de evidência.
-- [ ] Pipeline ANPR com limiares de confiança, medição de precisão e revisão humana.
-- [ ] Armazenamento de evidência cifrado, controlo de acesso e política de retenção.
-- [ ] Não implementar reconhecimento facial nem inferir a identidade do condutor.
+## 3. Peões e sensores
+- [x] Pedidos pedonais e estados WALK/STOP simulados.
+- [x] Entradas simuladas para as quatro linhas de paragem e ocupação ferroviária A/B.
+- [ ] Escolha, drivers e calibração de sensores físicos.
+- [ ] Detecção redundante de peões, veículos e ocupação ferroviária.
+- [ ] Medição de tempos de atravessamento e acessibilidade do desenho físico.
 
-## 4. Backend e nuvem
-- [x] API FastAPI, persistência SQLite e webhook opcional.
-- [x] Validação dos pedidos, gestão de ligações SQLite e chave API opcional.
-- [x] Estado de entrega do webhook exposto na resposta da API.
-- [ ] Autenticação/autorização por utilizador e serviço, rotação de segredos e auditoria.
-- [ ] Base de dados de produção, migrações, backups e recuperação.
-- [ ] Armazenamento de imagens/ficheiros fora da base de dados.
-- [ ] Fila de envio, repetição com backoff e monitorização do webhook.
-- [ ] Painel web de consulta, pesquisa, exportação e gestão de eventos.
-- [ ] Integração do simulador com API e testes de ponta a ponta.
+## 4. LoRa
+- [x] Painel de pacotes demonstrativos no simulador.
+- [x] Projecto PlatformIO de nó emissor ESP32/SX127x.
+- [x] Projecto PlatformIO de gateway receptor ESP32/SX127x.
+- [x] Formato de heartbeat JSON e leitura RSSI/SNR no gateway.
+- [ ] Compilação e teste com dois módulos rádio físicos.
+- [ ] Plano de frequência, potência, duty-cycle e antenas validado para a instalação.
+- [ ] Autenticação criptográfica, anti-replay, acknowledgements e retransmissão.
+- [ ] Integração da telemetria com sensores reais, API e backend.
+- [ ] Não usar LoRa para interlocking ou autorização de movimentos safety-critical.
 
-## 5. Segurança, qualidade e entrega
-- [x] Avisos de protótipo e documentação inicial de riscos.
-- [x] Testes unitários da API e verificações estruturais do simulador.
-- [x] Workflow de CI para testes backend, sintaxe JS, HTML/recursos e build PlatformIO.
-- [ ] Análise formal de perigos, requisitos de segurança e validação independente.
-- [ ] Avaliação RGPD e AIPD quando aplicável.
+## 5. Câmaras, backend e nuvem
+- [x] API FastAPI, SQLite, validação de eventos, chave API opcional e webhook.
+- [ ] Captura de vídeo IP/RTSP e integração ANPR com avaliação de precisão e revisão humana.
+- [ ] Armazenamento cifrado de evidências, controlo de acesso e retenção limitada.
+- [ ] Dashboard web para pesquisar, consultar e exportar ocorrências.
+- [ ] Integração do simulador e gateway LoRa com API/backend.
+- [ ] Base de dados de produção, migrações, backups, auditoria e gestão de utilizadores.
+
+## 6. Segurança, qualidade e entrega
+- [x] Avisos de protótipo e documentação de limites/privacidade.
+- [x] Testes API e verificações estruturais de HTML/recursos.
+- [x] CI para testes API, sintaxe JS, validação do simulador e builds PlatformIO.
+- [ ] Análise formal de perigos, requisitos, ensaios de falha e validação independente.
+- [ ] Avaliação RGPD/AIPD quando aplicável.
 - [ ] Revisão técnica externa antes de qualquer uso operacional.
 
 ## Critério de conclusão
