@@ -65,6 +65,25 @@ def main():
     standalone_ids = inspect_html(standalone_html, javascript, standalone=True)
 
     modular = modular_html.read_text(encoding="utf-8")
+    standalone = standalone_html.read_text(encoding="utf-8")
+    stylesheet = (SIMULATOR / "style.css").read_text(encoding="utf-8")
+    required_ids = {
+        "emergencyStop",
+        "exportLog",
+        "clearVehicles",
+        "addTrainA",
+        "addTrainB",
+        "rearmBtn",
+        "sensorA",
+        "sensorB",
+        "sendLora",
+    }
+    missing_required_ids = sorted(required_ids - set(re.findall(r'\\bid="([^"]+)"', modular)))
+    if missing_required_ids:
+        raise SystemExit(f"Controlos essenciais em falta: {missing_required_ids}")
+    if javascript not in standalone or stylesheet not in standalone:
+        raise SystemExit("standalone.html não corresponde aos ficheiros modulares actuais.")
+
     required_controls = {
         "road signals": len(re.findall(r'data-road="', modular)) == 12,
         "rail signals": len(re.findall(r'data-rail="', modular)) == 4,
