@@ -1,17 +1,43 @@
-import os
+from pathlib import Path
+import sys
+
 from fastapi.testclient import TestClient
 
-os.environ["DB_PATH"] = "test-events.db"
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from app import app
 
 client = TestClient(app)
 
-def test_health():
-    assert client.get("/health").json() == {"status": "ok"}
 
-def test_create_and_list_event():
+def test_health():
+    response = client.get("/health")
+    assert response.status_code == 200
+    assert response.json()["status"] == "ok"
+
+
+def test_create_and_list_event(tmp_path, monkeypatch):
+    monkeypatch.setenv("DB_PATH", str(tmp_path / "nested" / "events.db"))
     response = client.post("/events", json={"event_type": "test_violation", "approach": "N"})
     assert response.status_code == 201
-    event_id = response.json()["id"]
-    listed = client.get("/events?limit=10").json()
-    assert any(item["id"] == event_id for item in listed)
+    body = response.json()
+    assert body["event_type"] == "test_violation"
+    assert body["webhook_status"] == "not_configured"
+    listed = client.get("/events?limit=10")
+    assert listed.status_code == 200
+    assert any(item["id"] == body["id"] for item in listed.json())
+
+
+def test_api_key_is_read_at_request_time(monkeypatch, tmp_path):
+    monkeypatch.setenv("DB_PATH", str(tmp_path / "events.db"))
+    monkeypatch.setenv("API_KEY", "test-secret")
+    assert client.get("/events").status_code == 401
+    assert client.get("/events", headers={"X-API-Key": "test-secret"}).status_code == 200
+
+
+def test_event_validation():
+    response = client.post("/events", json={"event_type": ""})
+    assert response.status_code == 422
+
+
+def test_limit_validation():
+    assert client.get("/events?limit=0").status_code == 422
