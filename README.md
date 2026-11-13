@@ -28,7 +28,7 @@ Abre http://127.0.0.1:5500 no navegador.
 - Peões: os quatro botões de pedido colocam pedidos em fila. No modo manual, coloca os sinais rodoviários em vermelho e depois autoriza a passadeira pretendida.
 - Sensores: alterna a ocupação das vias A/B e os sensores de linha de paragem.
 - LoRa: envia um pacote JSON demonstrativo e apresenta RSSI/SNR simulados. O browser não transmite rádio.
-- Espaço: pausa/retoma; os botões no ecrã permitem limpar, reiniciar e simular incidentes.
+- Espaço: pausa/retoma; a paragem de emergência coloca o simulador em retenção, o rearme exige verificação, e o registo pode ser exportado para CSV.
 
 Os interbloqueios do simulador recusam verdes rodoviários perante prioridade ferroviária/pedonal e impedem a marcha ferroviária quando a zona está ocupada. São regras didácticas, não lógica certificada.
 
